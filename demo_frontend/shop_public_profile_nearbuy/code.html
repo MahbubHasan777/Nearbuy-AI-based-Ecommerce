@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Heritage Boutique | NearBuy</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary-fixed": "#ffdbc8",
+                    "secondary": "#994700",
+                    "secondary-container": "#fb7800",
+                    "inverse-primary": "#b7c4ff",
+                    "on-tertiary-fixed-variant": "#891e00",
+                    "on-error-container": "#93000a",
+                    "on-background": "#191b25",
+                    "surface-bright": "#fbf8ff",
+                    "on-primary-container": "#dfe3ff",
+                    "tertiary-fixed-dim": "#ffb4a1",
+                    "on-surface-variant": "#434656",
+                    "secondary-fixed-dim": "#ffb68b",
+                    "surface-container-lowest": "#ffffff",
+                    "outline-variant": "#c3c5d9",
+                    "on-primary-fixed": "#001452",
+                    "error-container": "#ffdad6",
+                    "surface-container-low": "#f3f2ff",
+                    "outline": "#737688",
+                    "on-tertiary": "#ffffff",
+                    "surface-dim": "#d9d9e7",
+                    "on-secondary-fixed-variant": "#753400",
+                    "on-error": "#ffffff",
+                    "error": "#ba1a1a",
+                    "on-tertiary-fixed": "#3c0800",
+                    "on-secondary-container": "#592600",
+                    "surface-container-high": "#e7e7f5",
+                    "primary-fixed-dim": "#b7c4ff",
+                    "on-tertiary-container": "#ffddd5",
+                    "surface-tint": "#004ced",
+                    "on-primary-fixed-variant": "#0038b6",
+                    "on-primary": "#ffffff",
+                    "on-secondary-fixed": "#321200",
+                    "surface-container": "#ededfb",
+                    "surface": "#fbf8ff",
+                    "on-secondary": "#ffffff",
+                    "primary-fixed": "#dde1ff",
+                    "tertiary-fixed": "#ffdbd2",
+                    "primary-container": "#0052ff",
+                    "surface-container-highest": "#e1e1ef",
+                    "on-surface": "#191b25",
+                    "primary": "#003ec7",
+                    "inverse-on-surface": "#f0effe",
+                    "surface-variant": "#e1e1ef",
+                    "tertiary-container": "#bf3003",
+                    "tertiary": "#952200",
+                    "background": "#fbf8ff",
+                    "inverse-surface": "#2e303a"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "unit": "4px",
+                    "lg": "24px",
+                    "sm": "8px",
+                    "xl": "32px",
+                    "margin": "24px",
+                    "gutter": "16px",
+                    "xs": "4px",
+                    "md": "16px"
+            },
+            "fontFamily": {
+                    "label-sm": ["Inter"],
+                    "h2": ["Inter"],
+                    "body-md": ["Inter"],
+                    "h3": ["Inter"],
+                    "label-md": ["Inter"],
+                    "h1": ["Inter"],
+                    "body-lg": ["Inter"]
+            },
+            "fontSize": {
+                    "label-sm": ["12px", {"lineHeight": "1", "fontWeight": "500"}],
+                    "h2": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "h3": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                    "label-md": ["14px", {"lineHeight": "1", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                    "h1": ["40px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .marker-pill {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+    </style>
+</head>
+<body class="bg-background font-body-md text-on-background">
+<!-- TopAppBar Shell -->
+<header class="bg-white/90 dark:bg-slate-900/90 backdrop-blur-md fixed top-0 w-full z-50 border-b border-slate-200 dark:border-slate-800 shadow-sm">
+<div class="flex items-center justify-between px-6 py-3 max-w-7xl mx-auto w-full">
+<div class="text-2xl font-black tracking-tighter text-blue-600 dark:text-blue-400">NearBuy</div>
+<nav class="hidden md:flex items-center space-x-8 font-['Inter'] antialiased text-sm tracking-tight">
+<a class="text-slate-600 dark:text-slate-400 hover:text-blue-500 font-medium transition-colors" href="#">Home</a>
+<a class="text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 pb-1 font-bold" href="#">Explore</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-blue-500 font-medium transition-colors" href="#">Categories</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-blue-500 font-medium transition-colors" href="#">Deals</a>
+</nav>
+<div class="flex items-center space-x-4">
+<button class="p-2 hover:bg-slate-50 dark:hover:bg-slate-800/50 rounded-lg transition-all active:scale-95">
+<span class="material-symbols-outlined text-slate-600">shopping_cart</span>
+</button>
+<button class="p-2 hover:bg-slate-50 dark:hover:bg-slate-800/50 rounded-lg transition-all active:scale-95">
+<span class="material-symbols-outlined text-slate-600">notifications</span>
+</button>
+<button class="p-2 hover:bg-slate-50 dark:hover:bg-slate-800/50 rounded-lg transition-all active:scale-95">
+<span class="material-symbols-outlined text-slate-600">account_circle</span>
+</button>
+</div>
+</div>
+</header>
+<main class="pt-20 pb-12 max-w-7xl mx-auto px-6">
+<!-- Profile Header Section -->
+<div class="relative mb-lg">
+<!-- Banner / Cover Image -->
+<div class="h-64 md:h-80 w-full rounded-xl overflow-hidden shadow-lg mb-xl bg-slate-200">
+<img alt="Boutique Interior" class="w-full h-full object-cover" data-alt="Interior of a luxury boutique with wooden shelves, soft warm lighting, and minimalist display of high-end home decor items" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD5zL-6KlJKb6JdxKgnoreZiXdi_zP232miAw3ap21iL1R354Z7WhVM0RSrzyov37gmvYmRkbdzl1Gnc7mLHiGPmHj67IR2edGUJDlFskj8dzmg4Sxsvacni8KPb7IBRUxruEyHBddSRSohkI1GVTTeBa8fYs181CZhD1ZEfPfLeV4guW8SuW7M4RDqmxuMieiUQeLcbrqnDPWWVvMoOsixt8lU0zZhHg8nEsahew4D8_Di1femRCRmp-efjlVZHessKWZCVK7X8Xs"/>
+</div>
+<!-- Profile Info Overlay Card -->
+<div class="bg-surface-container-lowest rounded-xl p-lg shadow-md -mt-24 relative z-10 border border-outline-variant/30">
+<div class="flex flex-col md:flex-row justify-between items-start gap-lg">
+<div class="flex gap-md items-start">
+<div class="w-24 h-24 md:w-32 md:h-32 rounded-xl overflow-hidden border-4 border-white shadow-md flex-shrink-0">
+<img alt="The Heritage Boutique Logo" class="w-full h-full object-cover" data-alt="Elegant minimalist logo of a boutique showing a stylized vintage crest on a clean white background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAlgtxc7MYS-SgGhu2glNPIr9g7qZpBNny0JFfeMQhunRKZEQ86ddtWm8RGgKQhhzcQiYnOI737bDy2Diflvqeqk_Q8xC5LoUF_TxH-Jam0p8QSTLZARdgF6L52iYk1IbYxUWPhvzN_ofjLgJHST0YhorR1gG5nP9TF14WbZ9gBrqZUYztg_7C8DEMqz0MxJ6j5OoWUdLLr78KHWgnj7NEZqy2OGOuyfmo-QbRQGdHv5kqu0IPH7eU8TrGKtvmKQJXyY1T4y5VtALc"/>
+</div>
+<div class="pt-2">
+<div class="flex items-center gap-2 mb-1">
+<h1 class="font-h1 text-h2 md:text-h1 text-on-surface">The Heritage Boutique</h1>
+<span class="material-symbols-outlined text-primary-container" style="font-variation-settings: 'FILL' 1;">verified</span>
+</div>
+<div class="flex items-center gap-sm mb-md">
+<div class="flex items-center bg-secondary-fixed px-2 py-0.5 rounded-full">
+<span class="material-symbols-outlined text-secondary text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="text-label-md text-secondary ml-1">4.8/5</span>
+</div>
+<span class="text-label-sm text-outline">(1,248 Reviews)</span>
+</div>
+<div class="flex items-center gap-1 text-on-surface-variant mb-md">
+<span class="material-symbols-outlined text-sm">location_on</span>
+<span class="font-body-md">124 Artisan Row, Neighborhood District</span>
+<button class="ml-2 text-primary font-label-md hover:underline">Get Directions</button>
+</div>
+<p class="font-body-lg italic text-outline max-w-2xl">
+                                "Hand-crafted quality for the modern home. Visit us for exclusive in-store deals!"
+                            </p>
+</div>
+</div>
+<div class="flex flex-row md:flex-col gap-sm w-full md:w-auto">
+<button class="flex-1 md:w-48 bg-primary text-on-primary py-3 px-6 rounded-lg font-label-md shadow-md active:scale-95 transition-all">Follow</button>
+<button class="flex-1 md:w-48 border border-primary text-primary py-3 px-6 rounded-lg font-label-md hover:bg-primary-fixed active:scale-95 transition-all">Message Shop</button>
+</div>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-xl">
+<!-- Sidebar: Shop Info -->
+<aside class="lg:col-span-4 order-2 lg:order-1">
+<div class="bg-surface-container-low rounded-xl p-lg border border-outline-variant/30 sticky top-24">
+<h3 class="font-h3 text-h3 text-on-surface mb-md">Shop Info</h3>
+<div class="mb-lg">
+<h4 class="font-label-md text-on-surface mb-sm">About</h4>
+<p class="font-body-md text-on-surface-variant leading-relaxed">
+                            Founded in 2012, The Heritage Boutique specializes in locally-sourced artisanal goods. From hand-poured candles to sustainable textiles, every piece in our collection is curated to bring warmth and timeless elegance to your living space.
+                        </p>
+</div>
+<div class="mb-lg">
+<h4 class="font-label-md text-on-surface mb-sm">Business Hours</h4>
+<ul class="space-y-2">
+<li class="flex justify-between text-body-md text-on-surface-variant">
+<span>Mon - Fri</span>
+<span>10:00 AM - 7:00 PM</span>
+</li>
+<li class="flex justify-between text-body-md text-on-surface-variant font-bold text-primary">
+<span>Saturday</span>
+<span>11:00 AM - 6:00 PM</span>
+</li>
+<li class="flex justify-between text-body-md text-on-surface-variant">
+<span>Sunday</span>
+<span>Closed</span>
+</li>
+</ul>
+</div>
+<div class="mb-lg">
+<h4 class="font-label-md text-on-surface mb-sm">Contact</h4>
+<div class="flex items-center gap-md text-body-md text-on-surface-variant">
+<span class="material-symbols-outlined text-primary">call</span>
+<span>(555) 123-4567</span>
+</div>
+</div>
+<div class="h-48 rounded-lg overflow-hidden relative shadow-inner bg-slate-100">
+<img alt="Map Location" class="w-full h-full object-cover opacity-80" data-alt="Minimalist map graphic showing a pin at 124 Artisan Row in a clean urban neighborhood layout" data-location="Neighborhood District" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDBcSbxHlCy5Y_n4Ln7Q-qPJa2VyBBej4PYJJ8s9eoCRVNeoZIhpdssTqOSJPpcDRyFDlHdlGPNiNBvzA_jS9v6SjMt8bTiMy6qmUk6PRXf9kGM0ksC5EJBWQ1EtbkoAKEdZlSmq1_qkkzbgngRp42798iej0bdQsnMq6hRgZOLbrcHdLERp1rOwVfpBhzJuLhmpGHGvnnFWENEjNeElVoH4JxeJYRWwDuOXL7FHvOl4zs5O8auEtRq1CK5Hwmd2SzuKWI_CNW8pwM"/>
+<div class="absolute inset-0 flex items-center justify-center">
+<span class="material-symbols-outlined text-secondary-container text-4xl" style="font-variation-settings: 'FILL' 1;">location_on</span>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<div class="lg:col-span-8 order-1 lg:order-2 space-y-xl">
+<!-- Popular Products Bento Grid -->
+<section>
+<div class="flex justify-between items-end mb-lg">
+<div>
+<h2 class="font-h2 text-h2 text-on-surface">Popular Products</h2>
+<p class="text-body-md text-on-surface-variant">Community favorites and seasonal must-haves</p>
+</div>
+<button class="text-primary font-label-md hover:underline flex items-center gap-1">
+                            View All <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
+<!-- Featured Large Card -->
+<div class="md:col-span-2 group relative bg-surface-container-lowest rounded-xl overflow-hidden shadow-md border border-outline-variant/20">
+<div class="h-64 overflow-hidden">
+<img alt="Artisan Throw" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Close-up texture of a hand-woven artisan wool throw blanket in earthy neutral tones" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCjXt2KVvrG7w6B-7C0me8KaQw3qXlS-dtdX190NVGzhVe_0nNQdzgwL_ThqYRtgNqpnhtR30gY2v1Uba7G_UOTrGENx3tZXdu0wgeZNAIBy9X-Jf5kL6_N_9zsOVYee_LEztxzcvwZsndDM3fQ6Bwc13XaXVjH527-IRT7PBtboROTFhO_o3n5VQd8oUQQFU9k-SXPX6YDrvJC-XFClHvZYDv5FmXoz7d02GXbVSbvIZZongq7abvBQDqHBYCDg6VKFZQUypIrQQQ"/>
+</div>
+<div class="p-lg flex justify-between items-center">
+<div>
+<span class="text-label-sm uppercase tracking-widest text-secondary font-bold">Featured Arrival</span>
+<h3 class="font-h3 text-h3 text-on-surface">Hand-Woven Merino Throw</h3>
+<p class="text-body-md text-on-surface-variant">$185.00</p>
+</div>
+<button class="bg-secondary-container text-on-primary py-3 px-6 rounded-lg font-label-md shadow-md active:scale-95 transition-all">Quick Add</button>
+</div>
+</div>
+<!-- Grid Items -->
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-md border border-outline-variant/20 flex flex-col">
+<div class="h-48 overflow-hidden">
+<img alt="Ceramic Vase" class="w-full h-full object-cover" data-alt="Minimalist matte white ceramic vase on a wooden pedestal with soft natural light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCGc1G0D7lD3PynrBxEUfcW9H22VR9MhwzcebpEVJ5h6iwPdoCCqxIl62X9EswKIJSToIE9UADD4lZSpFGV7_MeplR9TreLHp8WEU3DlEddwnicDDTuc-2M64I2cslKR9PnvNKQLhOHCDrOblzR4qia1H9nbUPZ-6VItEVlq8vY5xlxRexv3fZKbaqIke_FbTOzCa1hjywdthoNnzq-9cH6BvR0rO2CNq9B9wrrbqCj4_VaJEqw39RlYQ-RpwDpKBl7UVoYwlKySc8"/>
+</div>
+<div class="p-md flex-1 flex flex-col justify-between">
+<div class="mb-md">
+<h4 class="font-label-md text-on-surface">Minimalist Matte Vase</h4>
+<p class="text-body-md text-on-surface-variant">$42.00</p>
+</div>
+<button class="w-full border border-secondary-container text-secondary py-2 rounded-lg font-label-md hover:bg-secondary-fixed/30 transition-all">Quick Add</button>
+</div>
+</div>
+<div class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-md border border-outline-variant/20 flex flex-col">
+<div class="h-48 overflow-hidden">
+<img alt="Linen Pillows" class="w-full h-full object-cover" data-alt="Stack of three organic linen pillows in mustard, sage, and charcoal colors" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAW7jq6r4jWTFG51rvvW5NwJuY_9olhAhwZGiU1zDpVCCT_iRrVh_Vk1l7e9KP74sPJGPag2smFBgO75iT_8n1xVKbnYP3nZec2EAZmxpDy4nfA-TVXcl6ftFZxWmYkuWTfyk2dIp06HphQp9qiHpjciUw8QbC4ZstFVIJhK-_PEEsRKb6gWOnuI1rFtIKTuNJ3LK_Omcrp8hZjeIIILjM_OdeCqnH4-wGI2YMBj98P1QwLlOziH8GKdtvhWqrUIQfnGsLNDXOvCkk"/>
+</div>
+<div class="p-md flex-1 flex flex-col justify-between">
+<div class="mb-md">
+<h4 class="font-label-md text-on-surface">Organic Linen Pillows</h4>
+<p class="text-body-md text-on-surface-variant">$65.00</p>
+</div>
+<button class="w-full border border-secondary-container text-secondary py-2 rounded-lg font-label-md hover:bg-secondary-fixed/30 transition-all">Quick Add</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Top-Rated Items Carousel Mockup -->
+<section>
+<h2 class="font-h2 text-h2 text-on-surface mb-lg">Top-Rated Items</h2>
+<div class="flex gap-md overflow-x-auto pb-4 scrollbar-hide">
+<!-- Rating Card 1 -->
+<div class="min-w-[280px] bg-surface-container-lowest rounded-xl p-md border border-outline-variant/20 shadow-sm flex items-center gap-md">
+<div class="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
+<img alt="Candle" class="w-full h-full object-cover" data-alt="Elegant amber glass candle jar with a lit wick in a dark cozy setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCcqqRUAZIF5w0cfOVbcsl4w9GwDn1BsxCxquTvr-X50nWCJUkua3hCIxDb3X1MP1xnggAcj5ucGZV73FldMhgn9vd9jwYTiR9FKBS9ml-CKBtKDefp0C2qWysdjNNHS8L6R8XrwQ4m2tYgITv7k8I6HbSDcIjh1ELb-hkrrf0v_EINA0_TT3zYWmqHAezDC22TdtYPUw4VXyUq-cKpE6oXWtV8b37scflblCSAyDC1rbeTN2GYRo6rgjIfIzSQanK-StZTH3BOvtU"/>
+</div>
+<div>
+<h4 class="font-label-md text-on-surface line-clamp-1">Cedar &amp; Bergamot Candle</h4>
+<div class="flex items-center gap-1 my-1">
+<span class="material-symbols-outlined text-secondary text-xs" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-secondary text-xs" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-secondary text-xs" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-secondary text-xs" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-secondary text-xs" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="text-label-sm text-outline ml-1">5.0</span>
+</div>
+<p class="text-label-md text-primary">$28.00</p>
+</div>
+</div>
+<!-- Rating Card 2 -->
+<div class="min-w-[280px] bg-surface-container-lowest rounded-xl p-md border border-outline-variant/20 shadow-sm flex items-center gap-md">
+<div class="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
+<img alt="Brass Mirror" class="w-full h-full object-cover" data-alt="Round vintage brass-framed mirror reflecting a stylish bedroom interior" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDqhA-eTpL5p1PeDn8WCQn3DurFr0MpR83RUDAiZ_Gyoq_nO1C-WiRRr2tDbGlEymwWERMMtdIEWo1QsFq7YqRhOPORRBlMMKjA7HaxDWk-OCzl56fJ07J1atxb1Qf9uKP7VTr5zzCrO4xUOibUmMsUitinKZs-9Imaowg7fLY9s1EnP_4d_nTmEvBpsu6VOpjhCKpA8wzg01rsd20WhdNtPgY5FfHhiQ26SJZWapn2L_o4dDUQ8Mv2H3ZYbnNEguxJQ3PGBhPexsA"/>
+</div>
+<div>
+<h4 class="font-label-md text-on-surface line-clamp-1">Antique Brass Wall Mirror</h4>
+<div class="flex items-center gap-1 my-1">
+<span class="material-symbols-outlined text-secondary text-xs" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-secondary text-xs" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-secondary text-xs" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-secondary text-xs" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-secondary text-xs" style="font-variation-settings: 'FILL' 0;">star</span>
+<span class="text-label-sm text-outline ml-1">4.9</span>
+</div>
+<p class="text-label-md text-primary">$120.00</p>
+</div>
+</div>
+<!-- Rating Card 3 -->
+<div class="min-w-[280px] bg-surface-container-lowest rounded-xl p-md border border-outline-variant/20 shadow-sm flex items-center gap-md">
+<div class="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
+<img alt="Bamboo Board" class="w-full h-full object-cover" data-alt="Polished bamboo cutting board with organic grains on a grey marble counter" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBYFRO6SmML93Gfl-e2GQ3PwBSaZvqHBFFqSGNCOBTj4Xtlp7pCbEVI4p0n4zqFshCQaAEzFgvIlejoxsx0twuIHzIjHNgMhn8TTjLs4zzOutYR-Rf7TxiKcXRGZ01-WItlRi4q8B7KQsO0JxomV5Go3LPzX4C2j5bUAWN2eH6ssjw5JBC6oX1C7zMKMEO_w-_2Lz1IfoSpuWf04GTBp7zxltPTlVtH5QcilLcexu2DEgkhWhvR0ULqxJSa2W8SzcytDdVMIrDA_bA"/>
+</div>
+<div>
+<h4 class="font-label-md text-on-surface line-clamp-1">Sustainable Bamboo Board</h4>
+<div class="flex items-center gap-1 my-1">
+<span class="material-symbols-outlined text-secondary text-xs" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-secondary text-xs" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-secondary text-xs" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-secondary text-xs" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-secondary text-xs" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="text-label-sm text-outline ml-1">5.0</span>
+</div>
+<p class="text-label-md text-primary">$35.00</p>
+</div>
+</div>
+</div>
+</section>
+</div>
+</div>
+</main>
+<!-- Footer Shell -->
+<footer class="bg-slate-50 dark:bg-slate-950 w-full border-t border-slate-200 dark:border-slate-800 mt-auto">
+<div class="flex flex-col md:flex-row justify-between items-center px-8 py-12 gap-6 w-full max-w-7xl mx-auto">
+<div class="flex flex-col gap-2">
+<div class="text-lg font-bold text-slate-900 dark:text-white">NearBuy Neighborhood Stewardship</div>
+<p class="font-['Inter'] text-xs uppercase tracking-widest font-semibold text-slate-500 dark:text-slate-400">© 2024 NearBuy. All rights reserved.</p>
+</div>
+<div class="flex gap-8">
+<a class="font-['Inter'] text-xs uppercase tracking-widest font-semibold text-slate-500 dark:text-slate-400 hover:text-blue-500 underline-offset-4 hover:underline transition-all cursor-pointer" href="#">About Us</a>
+<a class="font-['Inter'] text-xs uppercase tracking-widest font-semibold text-slate-500 dark:text-slate-400 hover:text-blue-500 underline-offset-4 hover:underline transition-all cursor-pointer" href="#">Sell on NearBuy</a>
+<a class="font-['Inter'] text-xs uppercase tracking-widest font-semibold text-slate-500 dark:text-slate-400 hover:text-blue-500 underline-offset-4 hover:underline transition-all cursor-pointer" href="#">Privacy Policy</a>
+<a class="font-['Inter'] text-xs uppercase tracking-widest font-semibold text-slate-500 dark:text-slate-400 hover:text-blue-500 underline-offset-4 hover:underline transition-all cursor-pointer" href="#">Support Center</a>
+</div>
+</div>
+</footer>
+</body></html>

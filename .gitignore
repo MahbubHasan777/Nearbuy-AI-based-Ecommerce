@@ -8,5 +8,11 @@ backend/dist/
 backend/.env
 backend/uploads/
 
+frontend/node_modules/
+frontend/.next/
+frontend/.env.local
+
 python-services/__pycache__/
 python-services/.venv/
+
+*.zip

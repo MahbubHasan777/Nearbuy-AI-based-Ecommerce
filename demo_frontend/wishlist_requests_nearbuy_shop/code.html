@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Wishlist Requests - Shop Steward</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-primary": "#b7c4ff",
+                        "on-tertiary": "#ffffff",
+                        "primary-fixed": "#dde1ff",
+                        "on-secondary-fixed-variant": "#753400",
+                        "on-error": "#ffffff",
+                        "tertiary": "#952200",
+                        "surface-dim": "#d9d9e7",
+                        "tertiary-fixed-dim": "#ffb4a1",
+                        "on-surface-variant": "#434656",
+                        "on-error-container": "#93000a",
+                        "error-container": "#ffdad6",
+                        "surface-variant": "#e1e1ef",
+                        "on-surface": "#191b25",
+                        "inverse-on-surface": "#f0effe",
+                        "surface-container-low": "#f3f2ff",
+                        "on-secondary-fixed": "#321200",
+                        "secondary-fixed-dim": "#ffb68b",
+                        "surface-tint": "#004ced",
+                        "inverse-surface": "#2e303a",
+                        "outline-variant": "#c3c5d9",
+                        "on-primary-container": "#dfe3ff",
+                        "secondary": "#994700",
+                        "on-tertiary-container": "#ffddd5",
+                        "primary-fixed-dim": "#b7c4ff",
+                        "surface": "#fbf8ff",
+                        "surface-container-high": "#e7e7f5",
+                        "on-secondary": "#ffffff",
+                        "tertiary-fixed": "#ffdbd2",
+                        "on-background": "#191b25",
+                        "secondary-fixed": "#ffdbc8",
+                        "error": "#ba1a1a",
+                        "on-tertiary-fixed-variant": "#891e00",
+                        "on-primary-fixed-variant": "#0038b6",
+                        "secondary-container": "#fb7800",
+                        "on-primary": "#ffffff",
+                        "surface-bright": "#fbf8ff",
+                        "tertiary-container": "#bf3003",
+                        "outline": "#737688",
+                        "on-secondary-container": "#592600",
+                        "surface-container-highest": "#e1e1ef",
+                        "primary": "#003ec7",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed": "#001452",
+                        "background": "#fbf8ff",
+                        "primary-container": "#0052ff",
+                        "on-tertiary-fixed": "#3c0800",
+                        "surface-container": "#ededfb"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "unit": "4px",
+                        "md": "16px",
+                        "xs": "4px",
+                        "lg": "24px",
+                        "gutter": "16px",
+                        "sm": "8px",
+                        "margin": "24px",
+                        "xl": "32px"
+                    },
+                    "fontFamily": {
+                        "h3": ["Inter"],
+                        "body-md": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "h2": ["Inter"],
+                        "h1": ["Inter"],
+                        "label-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "h3": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "label-sm": ["12px", {"lineHeight": "1", "fontWeight": "500"}],
+                        "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "h2": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "h1": ["40px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "label-md": ["14px", {"lineHeight": "1", "letterSpacing": "0.01em", "fontWeight": "600"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface">
+<!-- TopAppBar -->
+<header class="sticky top-0 z-40 flex justify-between items-center px-6 h-16 w-full bg-white border-b border-gray-200 shadow-md font-['Inter'] antialiased">
+<div class="flex items-center gap-md">
+<span class="text-xl font-bold text-[#0052FF]">Shop Steward</span>
+<div class="hidden md:flex ml-xl items-center relative">
+<span class="material-symbols-outlined absolute left-3 text-outline">search</span>
+<input class="pl-10 pr-4 py-2 bg-surface-container border-none rounded-lg text-label-md focus:ring-2 focus:ring-primary-container w-64" placeholder="Search requests..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-lg">
+<button class="p-2 hover:bg-gray-50 transition-colors active:scale-95 duration-150">
+<span class="material-symbols-outlined text-gray-500">notifications</span>
+</button>
+<button class="p-2 hover:bg-gray-50 transition-colors active:scale-95 duration-150">
+<span class="material-symbols-outlined text-gray-500">settings</span>
+</button>
+<div class="h-8 w-8 rounded-full overflow-hidden border border-outline-variant">
+<img class="h-full w-full object-cover" data-alt="Close-up portrait of a professional shop manager in a clean modern retail environment" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCcJGbbV7QdTtA60dFMEPc3zP5nOyI_vKu_f7ifglBMHnaTrtEvC6FxUEM-mfU0eBV0edGILZnl7EFMhqpHxrVU2rw9SIHJ33HyCyc3ySNwmWlOtc8J92eGfHpNurFMyXDdcu_i69db-mISCaumTe_xeM04kuVg6kxmy2x7US1JRhBqKCUVjRVR2PrWPnpQsjjU_DxQuZozW6HzDMffmURg4m_BCe9gq09EIKV-Av4N4DfRB1w-7UIV_lGdJ9PvFrPTW2Uh0X1IxlA"/>
+</div>
+</div>
+</header>
+<div class="flex">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-full flex flex-col py-6 z-50 overflow-y-auto bg-gray-50 h-screen w-64 border-r border-gray-200 rounded-none">
+<div class="px-6 mb-xl">
+<div class="flex items-center gap-3">
+<div class="h-10 w-10 bg-primary-container rounded-lg flex items-center justify-center text-white">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">storefront</span>
+</div>
+<div>
+<h2 class="text-lg font-black text-[#0052FF] tracking-tight">Local Market</h2>
+<p class="text-xs text-gray-500">Main Street Branch</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 px-2 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:text-[#0052FF] hover:bg-gray-100 transition-all hover:translate-x-1 duration-200 font-['Inter'] text-sm font-medium" href="#">
+<span class="material-symbols-outlined">dashboard</span> Dashboard
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:text-[#0052FF] hover:bg-gray-100 transition-all hover:translate-x-1 duration-200 font-['Inter'] text-sm font-medium" href="#">
+<span class="material-symbols-outlined">inventory_2</span> Inventory
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 text-[#0052FF] bg-blue-50 rounded-r-full font-semibold border-l-4 border-[#0052FF] transition-all hover:translate-x-1 duration-200 font-['Inter'] text-sm font-medium" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">heart_plus</span> Wishlist Requests
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:text-[#0052FF] hover:bg-gray-100 transition-all hover:translate-x-1 duration-200 font-['Inter'] text-sm font-medium" href="#">
+<span class="material-symbols-outlined">group</span> Customers
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:text-[#0052FF] hover:bg-gray-100 transition-all hover:translate-x-1 duration-200 font-['Inter'] text-sm font-medium" href="#">
+<span class="material-symbols-outlined">monitoring</span> Analytics
+                </a>
+</nav>
+<div class="px-6 mb-xl">
+<button class="w-full py-3 bg-primary-container text-white rounded-lg font-bold shadow-md hover:shadow-lg transition-shadow active:scale-95 duration-150 flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">add</span> Add Product
+                </button>
+</div>
+<div class="mt-auto px-2 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:text-[#0052FF] hover:bg-gray-100 transition-all hover:translate-x-1 duration-200 font-['Inter'] text-sm font-medium" href="#">
+<span class="material-symbols-outlined">help</span> Help Center
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:text-[#0052FF] hover:bg-gray-100 transition-all hover:translate-x-1 duration-200 font-['Inter'] text-sm font-medium" href="#">
+<span class="material-symbols-outlined">logout</span> Logout
+                </a>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="ml-64 flex-1 p-lg bg-surface">
+<div class="max-w-6xl mx-auto">
+<div class="flex justify-between items-end mb-xl">
+<div>
+<h1 class="font-h1 text-h1 text-on-surface mb-2">Wishlist Requests</h1>
+<p class="font-body-md text-body-md text-outline">Manage and fulfill special requests from your local community.</p>
+</div>
+<div class="flex gap-md">
+<div class="bg-surface-container-lowest p-md rounded-lg shadow-sm border border-outline-variant flex items-center gap-md">
+<div class="h-10 w-10 rounded-full bg-blue-50 flex items-center justify-center">
+<span class="material-symbols-outlined text-[#0052FF]">pending_actions</span>
+</div>
+<div>
+<p class="text-label-sm text-outline uppercase tracking-wider">Total Active Requests</p>
+<p class="text-h3 font-h3 text-on-surface">24</p>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-md rounded-lg shadow-sm border border-outline-variant flex items-center gap-md">
+<div class="h-10 w-10 rounded-full bg-green-50 flex items-center justify-center">
+<span class="material-symbols-outlined text-green-600">task_alt</span>
+</div>
+<div>
+<p class="text-label-sm text-outline uppercase tracking-wider">Fulfilled This Week</p>
+<p class="text-h3 font-h3 text-on-surface">18</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Requests Table Container -->
+<div class="bg-surface-container-lowest rounded-xl shadow-md overflow-hidden border border-outline-variant">
+<table class="w-full text-left border-collapse">
+<thead class="bg-gray-50 border-b border-outline-variant">
+<tr>
+<th class="px-lg py-md font-label-md text-label-md text-outline">CUSTOMER</th>
+<th class="px-lg py-md font-label-md text-label-md text-outline">PRODUCT REQUESTED</th>
+<th class="px-lg py-md font-label-md text-label-md text-outline">DATE REQUESTED</th>
+<th class="px-lg py-md font-label-md text-label-md text-outline">STATUS</th>
+<th class="px-lg py-md font-label-md text-label-md text-outline text-right">ACTIONS</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<!-- Pending Row -->
+<tr class="hover:bg-gray-50 transition-colors">
+<td class="px-lg py-lg">
+<div class="flex items-center gap-md">
+<div class="h-10 w-10 rounded-full overflow-hidden bg-surface-container-high">
+<img class="h-full w-full object-cover" data-alt="Portrait of a smiling young woman customer in a casual studio setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA1gIRspBOryeO0du7Qsq7RdqOaNFeYhQFiAk2gOPSFv4lMrfMcO1gCPCDgqAxB8994Lccij5bJsB_pJXHdQRsNvtA5nNxAFAxTdmJqv5u44Kyzl8eK5CvHvhU5O4e5-KLUs8vrkQpHcDiuLmkaF45yflxfXa72sM5KF1YCM_hGYAofjLeGP3nMNmxqMtQGk3pAOYT-7JkvX4i9y8xZkijAuHbybrAzRmK1YZzgbjv7BgOB2_LhQDiw8vgY8kbt3WulxQqEA9y8RjE"/>
+</div>
+<div>
+<p class="font-label-md text-on-surface">Sarah Johnson</p>
+<p class="text-label-sm text-outline">Loyal Customer</p>
+</div>
+</div>
+</td>
+<td class="px-lg py-lg">
+<div class="flex items-center gap-md">
+<div class="h-12 w-12 rounded-lg bg-surface-container border border-outline-variant overflow-hidden">
+<img class="h-full w-full object-cover" data-alt="Minimalist white professional camera lens on a clean studio background with soft lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAXxb_ffCm-ps-veU_fAYNpApT0lFqbLUS00YOB0iY-0F_ps82urIvPCmuvLueJMG_Gg3Hqu2D67q2fIAF8F4F0OqJzYxfBeeeFEte9bcCAVFsjDf_yL4AQcYvphCyKTUtgmD6RBHcJa6yuAkYuzx2P9hFUHtYEXooSW1AmTm55ReZvXk7v__aj7WdgWCe5u-dj50wa6rYP9AofkrY0mWX0Z4BWQhvmAlK1m-XJVCE0uaYliLWL1Ca0WFjMAjzVkGE31SCO69eHnSQ"/>
+</div>
+<div>
+<p class="font-label-md text-on-surface">Artisan Ceramic Kettle</p>
+<p class="text-label-sm text-outline">Kitchenware</p>
+</div>
+</div>
+</td>
+<td class="px-lg py-lg font-body-md text-on-surface">Oct 24, 2023</td>
+<td class="px-lg py-lg">
+<span class="px-3 py-1 bg-blue-50 text-blue-700 text-label-sm rounded-full font-semibold">Pending</span>
+</td>
+<td class="px-lg py-lg text-right">
+<div class="flex justify-end gap-sm">
+<button class="px-4 py-2 bg-primary-container text-white rounded-lg text-label-sm font-bold shadow-sm hover:bg-primary transition-colors active:scale-95 duration-150">Mark as Done</button>
+<button class="px-4 py-2 border border-error text-error rounded-lg text-label-sm font-bold hover:bg-error-container transition-colors active:scale-95 duration-150">Reject</button>
+</div>
+</td>
+</tr>
+<!-- Pending Row 2 -->
+<tr class="hover:bg-gray-50 transition-colors">
+<td class="px-lg py-lg">
+<div class="flex items-center gap-md">
+<div class="h-10 w-10 rounded-full overflow-hidden bg-surface-container-high">
+<img class="h-full w-full object-cover" data-alt="Close up of a man with short hair and friendly expression against a neutral background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD0VvuGBApeyT4ncXf2eD9z7EMCCnuSyqxcHrgP7aFAZKfJ4-An3XKfwYHxzoaRd2O8fMHuyfiiNEawX-d3EY2iTybwGnyN5EdkTdDGHpmBGXbv6i_XIo3bjTjZSFyxpFOCY-S532ibMc7BENo14yKCy7eZWrMP6Yum6GY45f07VzEgwomjTYSUgnyaGDqmCAqtasIhvJSE79sl-8wFGXEyVj6ORt6RTu0dtfZj3hifkkgAmsPMkEjauWVxNaQoTmoFthTtA4PJctE"/>
+</div>
+<div>
+<p class="font-label-md text-on-surface">Marcus Chen</p>
+<p class="text-label-sm text-outline">New Customer</p>
+</div>
+</div>
+</td>
+<td class="px-lg py-lg">
+<div class="flex items-center gap-md">
+<div class="h-12 w-12 rounded-lg bg-surface-container border border-outline-variant overflow-hidden">
+<img class="h-full w-full object-cover" data-alt="Premium wireless over-ear headphones on a clean wooden surface with soft bokeh lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCzwkexMstVnfuS_xc-MQpAc_VO3Iuy7IrqVyi5PlMC03kqUCJapJd4JMSriIWEBvtgNGJETDB0AA0uGZvosBvq5Z1m26lGSZUMssmAeIuDuda_rHOHsUZkSeGzcEw8h_3HQGvZ7xtJhlM3Ikh1_pujn9QO7xJksyNqFdmswpG9YlhrKDQenY_IUqIih4-OxEMp_ga54d8BF8TNMJ33OFF6U8pO9sT6mXUmkvUW0DfKy0gygUsgpQx_GQo3KEBPjHXv8Kz9yqMtGS8"/>
+</div>
+<div>
+<p class="font-label-md text-on-surface">Vintage Vinyl Player</p>
+<p class="text-label-sm text-outline">Electronics</p>
+</div>
+</div>
+</td>
+<td class="px-lg py-lg font-body-md text-on-surface">Oct 25, 2023</td>
+<td class="px-lg py-lg">
+<span class="px-3 py-1 bg-blue-50 text-blue-700 text-label-sm rounded-full font-semibold">Pending</span>
+</td>
+<td class="px-lg py-lg text-right">
+<div class="flex justify-end gap-sm">
+<button class="px-4 py-2 bg-primary-container text-white rounded-lg text-label-sm font-bold shadow-sm hover:bg-primary transition-colors active:scale-95 duration-150">Mark as Done</button>
+<button class="px-4 py-2 border border-error text-error rounded-lg text-label-sm font-bold hover:bg-error-container transition-colors active:scale-95 duration-150">Reject</button>
+</div>
+</td>
+</tr>
+<!-- Done Row -->
+<tr class="hover:bg-gray-50 transition-colors opacity-75">
+<td class="px-lg py-lg">
+<div class="flex items-center gap-md">
+<div class="h-10 w-10 rounded-full overflow-hidden bg-surface-container-high">
+<img class="h-full w-full object-cover" data-alt="Portrait of a young woman with natural light and a calm professional expression" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDTMZCnHALS71MXxMRf-AcDONp-kJrEcIxoUP40U0yZXqdMYuwWCGl2LJeI6VZCQEGpY1_hTeHe9AFSm4JED3dvNvnmoXfZ2UF6TMQP0ARlnIaPqsMW_QTtMVndOQHlR8tzZpmq8N6ghzbWx27D5YwT0wPTOhtnl8idpzeenwC16tfh4eAJbdprMsVQY6CtXl2k7t7qnbYqLi3HCyAcSj2ByLE2i1xlJx3MfARPSCqjgyecJJ-sH46_5Pt_13MIpmRhx2XiCp7TS28"/>
+</div>
+<div>
+<p class="font-label-md text-on-surface">Elena Rodriguez</p>
+<p class="text-label-sm text-outline">Silver Member</p>
+</div>
+</div>
+</td>
+<td class="px-lg py-lg">
+<div class="flex items-center gap-md">
+<div class="h-12 w-12 rounded-lg bg-surface-container border border-outline-variant overflow-hidden">
+<img class="h-full w-full object-cover" data-alt="Close up of a high-quality instant camera with a retro aesthetic in soft focus" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAI7e5N8LjoDUNQrqMxYI5YfcYr8m2iTOk7rrGYCJY3jq3959r7UbRKFJtyYdeaohvbwPXW7Lz6LDeOM9j4utNZk74Xe_y6uCqBJ8MXf2JrHhU4_4E6KaNJJvBWCpsCMhBqCbAGlnyFgvcm3lP3TTe4Ozn88Qfqw1Yx7z8bQEz2eGZJmH0t-yajOT_yLfYeDiiXyoEqG12TMt74J2iauMotkRvj6aLcflmheiCxXYxtQoVG6ExSZKYsAVUDAzCztptCjXf4llOm8L4"/>
+</div>
+<div>
+<p class="font-label-md text-on-surface">Organic Cotton Tote</p>
+<p class="text-label-sm text-outline">Accessories</p>
+</div>
+</div>
+</td>
+<td class="px-lg py-lg font-body-md text-on-surface">Oct 22, 2023</td>
+<td class="px-lg py-lg">
+<span class="px-3 py-1 bg-green-50 text-green-700 text-label-sm rounded-full font-semibold">Done</span>
+</td>
+<td class="px-lg py-lg text-right">
+<button class="p-2 text-outline hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Rejected Row -->
+<tr class="hover:bg-gray-50 transition-colors opacity-75">
+<td class="px-lg py-lg">
+<div class="flex items-center gap-md">
+<div class="h-10 w-10 rounded-full overflow-hidden bg-surface-container-high">
+<img class="h-full w-full object-cover" data-alt="Portrait of a smiling man with glasses and a professional demeanor in an office" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBVro0u-IERUFVApOJH9f7lBfKaHcHBtDZIZJQTSvvgLQKeWi3UnVJZWmq2CjnSsDf85L0cNGzZuDKXY_RF4hGRMYRjzjXeLrRRjrk_6p15Nr4lYmlwj7O9A_W3T9AFf0e6CXjI7qGcjsclppRWcDVcLYKmp_v-jbQj5RqwfV90iGfGo-QK8ZceHZhcS5xlfx5Vj4_BVzAjhavto7COIzMPs9WzOMfxj_LPsPWztJcqsNS14d-0gPCtEWCTVM4HV_P_kuSaZfOpipE"/>
+</div>
+<div>
+<p class="font-label-md text-on-surface">David Wilson</p>
+<p class="text-label-sm text-outline">Bronze Member</p>
+</div>
+</div>
+</td>
+<td class="px-lg py-lg">
+<div class="flex items-center gap-md">
+<div class="h-12 w-12 rounded-lg bg-surface-container border border-outline-variant overflow-hidden">
+<img class="h-full w-full object-cover" data-alt="Vibrant red athletic shoe on a clean grey background with soft studio lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC0HYap1hvP_QPBLO7cOktQd9zfdZJ1V51xf6I3-VH33-rDE65srCqub6DCEtSj0T74uFOFc48Pa1FHdkhxYWXkUBCFiJaXpvMRDYk6VGDEu8pArDimcvptkAv0JHNH7Vj5CVgzeL8omEa1W_T4-iiUBXxoUss5I35HRkGDkbCr9SHKX23-0HzEUr_Nkh0ppNUL0OOiojloc4cuME1hfRBplKew5a_LwRbYkgoO0XEIVAzZxiPhd5zOi1UH1v0PJUhpsU-YAv7Ox94"/>
+</div>
+<div>
+<p class="font-label-md text-on-surface">Limited Sneakers v2</p>
+<p class="text-label-sm text-outline">Footwear</p>
+</div>
+</div>
+</td>
+<td class="px-lg py-lg font-body-md text-on-surface">Oct 20, 2023</td>
+<td class="px-lg py-lg">
+<span class="px-3 py-1 bg-red-50 text-red-700 text-label-sm rounded-full font-semibold">Rejected</span>
+</td>
+<td class="px-lg py-lg text-right">
+<button class="p-2 text-outline hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+<!-- Pagination Footer -->
+<div class="px-lg py-md bg-gray-50 border-t border-outline-variant flex items-center justify-between">
+<p class="text-label-sm text-outline">Showing 1-4 of 24 requests</p>
+<div class="flex gap-sm">
+<button class="p-2 border border-outline-variant rounded bg-white text-outline hover:bg-gray-50 transition-colors">
+<span class="material-symbols-outlined text-sm">chevron_left</span>
+</button>
+<button class="p-2 border border-outline-variant rounded bg-white text-outline hover:bg-gray-50 transition-colors">
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Neighborhood Pulse Tip -->
+<div class="mt-xl bg-blue-50 border border-blue-100 p-lg rounded-xl flex gap-lg items-start">
+<div class="h-10 w-10 rounded-lg bg-primary-container flex items-center justify-center text-white shrink-0">
+<span class="material-symbols-outlined">lightbulb</span>
+</div>
+<div>
+<h4 class="font-label-md text-[#0052FF] mb-1">Steward Tip: Local Trends</h4>
+<p class="font-body-md text-on-surface opacity-80">3 other customers have added the "Artisan Ceramic Kettle" to their wishlist this week. Consider stocking a small batch to fulfill demand quickly!</p>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>
