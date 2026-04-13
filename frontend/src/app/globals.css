@@ -1,11 +1,60 @@
 @import "tailwindcss";
 
+
 @theme {
   --font-sans: 'Inter', sans-serif;
+  --color-primary: #003ec7;
+  --color-primary-container: #0052ff;
+  --color-primary-fixed: #dde1ff;
+  --color-primary-fixed-dim: #b7c4ff;
+  --color-on-primary: #ffffff;
+  --color-on-primary-container: #dfe3ff;
+  --color-on-primary-fixed: #001452;
+  --color-on-primary-fixed-variant: #0038b6;
+  --color-secondary: #994700;
+  --color-secondary-container: #fb7800;
+  --color-secondary-fixed: #ffdbc8;
+  --color-secondary-fixed-dim: #ffb68b;
+  --color-on-secondary: #ffffff;
+  --color-on-secondary-container: #592600;
+  --color-on-secondary-fixed: #321200;
+  --color-on-secondary-fixed-variant: #753400;
+  --color-tertiary: #952200;
+  --color-tertiary-container: #bf3003;
+  --color-tertiary-fixed: #ffdbd2;
+  --color-tertiary-fixed-dim: #ffb4a1;
+  --color-on-tertiary: #ffffff;
+  --color-on-tertiary-container: #ffddd5;
+  --color-on-tertiary-fixed: #3c0800;
+  --color-on-tertiary-fixed-variant: #891e00;
+  --color-background: #fbf8ff;
+  --color-surface: #fbf8ff;
+  --color-surface-dim: #d9d9e7;
+  --color-surface-bright: #fbf8ff;
+  --color-surface-tint: #004ced;
+  --color-surface-variant: #e1e1ef;
+  --color-surface-container: #ededfb;
+  --color-surface-container-low: #f3f2ff;
+  --color-surface-container-high: #e7e7f5;
+  --color-surface-container-highest: #e1e1ef;
+  --color-surface-container-lowest: #ffffff;
+  --color-on-surface: #191b25;
+  --color-on-surface-variant: #434656;
+  --color-on-background: #191b25;
+  --color-outline: #737688;
+  --color-outline-variant: #c3c5d9;
+  --color-error: #ba1a1a;
+  --color-error-container: #ffdad6;
+  --color-on-error: #ffffff;
+  --color-on-error-container: #93000a;
+  --color-inverse-surface: #2e303a;
+  --color-inverse-on-surface: #f0effe;
+  --color-inverse-primary: #b7c4ff;
+  --shadow-card: 0 4px 12px rgba(0,82,255,0.05);
+  --shadow-card-hover: 0 8px 24px rgba(0,82,255,0.1);
+  --shadow-nav: 0 4px 12px rgba(0,82,255,0.05);
+  --shadow-nav-bottom: 0 -4px 16px rgba(0,0,0,0.08);
 }
-
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap');
 
 * {
   box-sizing: border-box;
