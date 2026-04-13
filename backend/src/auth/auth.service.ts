@@ -108,11 +108,11 @@ export class AuthService {
     } else if (userType === 'ADMIN') {
       const u = await this.prisma.admin.findUnique({ where: { id: userId } });
       if (!u) return null;
-      return { id: u.id, email: u.email, name: u.name, role: 'ADMIN' };
+      return { id: u.id, email: u.email, name: 'Admin', role: 'ADMIN' };
     } else if (userType === 'MODERATOR') {
       const u = await this.prisma.moderator.findUnique({ where: { id: userId } });
       if (!u) return null;
-      return { id: u.id, email: u.email, name: u.name, role: 'MODERATOR' };
+      return { id: u.id, email: u.email, name: 'Moderator', role: 'MODERATOR' };
     }
     return null;
   }
