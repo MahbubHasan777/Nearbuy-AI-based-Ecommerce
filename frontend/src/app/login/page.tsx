@@ -7,7 +7,7 @@ import Link from 'next/link';
 export default function LoginPage() {
   const { login } = useAuth();
   const router = useRouter();
-  const [form, setForm] = useState({ email: '', password: '', role: 'CUSTOMER' });
+  const [form, setForm] = useState({ email: '', password: '', userType: 'CUSTOMER' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -16,9 +16,9 @@ export default function LoginPage() {
     setError('');
     setLoading(true);
     try {
-      await login(form.email, form.password, form.role);
-      if (form.role === 'CUSTOMER') router.push('/');
-      else if (form.role === 'SHOP') router.push('/shop/dashboard');
+      await login(form.email, form.password, form.userType);
+      if (form.userType === 'CUSTOMER') router.push('/');
+      else if (form.userType === 'SHOP') router.push('/shop/dashboard');
       else router.push('/admin/dashboard');
     } catch {
       setError('Invalid email or password');
@@ -42,9 +42,9 @@ export default function LoginPage() {
             {(['CUSTOMER', 'SHOP', 'ADMIN'] as const).map(role => (
               <button
                 key={role}
-                onClick={() => setForm(f => ({ ...f, role }))}
+                onClick={() => setForm(f => ({ ...f, userType: role }))}
                 className={`flex-1 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${
-                  form.role === role
+                  form.userType === role
                     ? 'bg-white text-primary shadow-sm'
                     : 'text-on-surface-variant hover:text-on-surface'
                 }`}

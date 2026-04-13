@@ -6,7 +6,10 @@ import api from '@/lib/api';
 
 export default function RegisterPage() {
   const router = useRouter();
-  const [form, setForm] = useState({ firstName: '', lastName: '', email: '', phone: '', password: '', confirmPassword: '' });
+  const [form, setForm] = useState({
+    username: '', fullName: '', email: '', phone: '',
+    address: '', gender: 'MALE', password: '', confirmPassword: '',
+  });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -16,13 +19,14 @@ export default function RegisterPage() {
     setError('');
     setLoading(true);
     try {
-      await api.post('/auth/register', {
-        firstName: form.firstName,
-        lastName: form.lastName,
+      await api.post('/customer/register', {
+        username: form.username,
+        fullName: form.fullName,
         email: form.email,
         phone: form.phone,
+        address: form.address,
+        gender: form.gender,
         password: form.password,
-        role: 'CUSTOMER',
       });
       router.push('/login');
     } catch (err: any) {
@@ -46,38 +50,55 @@ export default function RegisterPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold text-outline uppercase tracking-wider mb-1.5">First Name</label>
-                <input required value={form.firstName} onChange={e => setForm(f => ({ ...f, firstName: e.target.value }))}
+                <label className="block text-xs font-bold text-outline uppercase tracking-wider mb-1.5">Username *</label>
+                <input required value={form.username} onChange={e => setForm(f => ({ ...f, username: e.target.value }))}
                   className="w-full border border-outline-variant rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-container focus:border-transparent outline-none transition-all"
-                  placeholder="John" />
+                  placeholder="john_doe" />
               </div>
               <div>
-                <label className="block text-xs font-bold text-outline uppercase tracking-wider mb-1.5">Last Name</label>
-                <input required value={form.lastName} onChange={e => setForm(f => ({ ...f, lastName: e.target.value }))}
+                <label className="block text-xs font-bold text-outline uppercase tracking-wider mb-1.5">Full Name *</label>
+                <input required value={form.fullName} onChange={e => setForm(f => ({ ...f, fullName: e.target.value }))}
                   className="w-full border border-outline-variant rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-container focus:border-transparent outline-none transition-all"
-                  placeholder="Doe" />
+                  placeholder="John Doe" />
               </div>
             </div>
             <div>
-              <label className="block text-xs font-bold text-outline uppercase tracking-wider mb-1.5">Email</label>
+              <label className="block text-xs font-bold text-outline uppercase tracking-wider mb-1.5">Email *</label>
               <input required type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
                 className="w-full border border-outline-variant rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-container focus:border-transparent outline-none transition-all"
                 placeholder="you@example.com" />
             </div>
-            <div>
-              <label className="block text-xs font-bold text-outline uppercase tracking-wider mb-1.5">Phone</label>
-              <input type="tel" value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))}
-                className="w-full border border-outline-variant rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-container focus:border-transparent outline-none transition-all"
-                placeholder="+880..." />
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-bold text-outline uppercase tracking-wider mb-1.5">Phone *</label>
+                <input required type="tel" value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))}
+                  className="w-full border border-outline-variant rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-container focus:border-transparent outline-none transition-all"
+                  placeholder="+8801..." />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-outline uppercase tracking-wider mb-1.5">Gender *</label>
+                <select required value={form.gender} onChange={e => setForm(f => ({ ...f, gender: e.target.value }))}
+                  className="w-full border border-outline-variant rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-container outline-none transition-all">
+                  <option value="MALE">Male</option>
+                  <option value="FEMALE">Female</option>
+                  <option value="OTHER">Other</option>
+                </select>
+              </div>
             </div>
             <div>
-              <label className="block text-xs font-bold text-outline uppercase tracking-wider mb-1.5">Password</label>
+              <label className="block text-xs font-bold text-outline uppercase tracking-wider mb-1.5">Address *</label>
+              <input required value={form.address} onChange={e => setForm(f => ({ ...f, address: e.target.value }))}
+                className="w-full border border-outline-variant rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-container focus:border-transparent outline-none transition-all"
+                placeholder="House 12, Road 5, Dhaka" />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-outline uppercase tracking-wider mb-1.5">Password *</label>
               <input required type="password" value={form.password} onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
                 className="w-full border border-outline-variant rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-container focus:border-transparent outline-none transition-all"
-                placeholder="••••••••" />
+                placeholder="Min 8 characters" />
             </div>
             <div>
-              <label className="block text-xs font-bold text-outline uppercase tracking-wider mb-1.5">Confirm Password</label>
+              <label className="block text-xs font-bold text-outline uppercase tracking-wider mb-1.5">Confirm Password *</label>
               <input required type="password" value={form.confirmPassword} onChange={e => setForm(f => ({ ...f, confirmPassword: e.target.value }))}
                 className="w-full border border-outline-variant rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary-container focus:border-transparent outline-none transition-all"
                 placeholder="••••••••" />

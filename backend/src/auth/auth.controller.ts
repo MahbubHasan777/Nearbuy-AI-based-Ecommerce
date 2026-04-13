@@ -67,6 +67,12 @@ export class AuthController {
     return this.authService.getSessions(req.user.id, req.user.role);
   }
 
+  @Get('me')
+  @UseGuards(TokenGuard)
+  async getMe(@Req() req: any) {
+    return this.authService.getMe(req.user.id, req.user.role);
+  }
+
   @Post('forgot-password')
   @HttpCode(200)
   async forgotPassword(@Body() dto: ForgotPasswordDto) {

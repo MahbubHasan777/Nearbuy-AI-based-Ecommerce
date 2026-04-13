@@ -96,6 +96,27 @@ export class AuthService {
     });
   }
 
+  async getMe(userId: string, userType: UserType) {
+    if (userType === 'CUSTOMER') {
+      const u = await this.prisma.customer.findUnique({ where: { id: userId } });
+      if (!u) return null;
+      return { id: u.id, email: u.email, name: u.fullName, role: 'CUSTOMER' };
+    } else if (userType === 'SHOP') {
+      const u = await this.prisma.shop.findUnique({ where: { id: userId } });
+      if (!u) return null;
+      return { id: u.id, email: u.ownerEmail, name: u.shopName, role: 'SHOP' };
+    } else if (userType === 'ADMIN') {
+      const u = await this.prisma.admin.findUnique({ where: { id: userId } });
+      if (!u) return null;
+      return { id: u.id, email: u.email, name: u.name, role: 'ADMIN' };
+    } else if (userType === 'MODERATOR') {
+      const u = await this.prisma.moderator.findUnique({ where: { id: userId } });
+      if (!u) return null;
+      return { id: u.id, email: u.email, name: u.name, role: 'MODERATOR' };
+    }
+    return null;
+  }
+
   async forgotPassword(email: string) {
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000);

@@ -38,8 +38,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => { fetchMe(); }, []);
 
-  const login = async (email: string, password: string, role: string) => {
-    await api.post('/auth/login', { email, password, role });
+  const login = async (email: string, password: string, userType: string) => {
+    await api.post('/auth/login', { email, password, userType });
+
     await fetchMe();
   };
 
