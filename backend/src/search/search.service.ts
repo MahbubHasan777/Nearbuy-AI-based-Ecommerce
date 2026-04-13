@@ -1,0 +1,194 @@
+import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { Product, ProductDocument } from '../product/schemas/product.schema';
+import { PrismaService } from '../prisma/prisma.service';
+import { GeoService } from '../geo/geo.service';
+
+@Injectable()
+export class SearchService {
+  constructor(
+    @InjectModel(Product.name)
+    private productModel: Model<ProductDocument>,
+    private prisma: PrismaService,
+    private geo: GeoService,
+  ) {}
+
+  async search(query: string, customerId: string, params: Record<string, string>) {
+    const customer = await this.prisma.customer.findUnique({
+      where: { id: customerId },
+    });
+
+    const radius = params['radius'] ? Number(params['radius']) : (customer?.radiusMeters ?? 5000);
+
+    const allShops: any[] = await this.prisma.shop.findMany({
+      where: { status: 'APPROVED', isActive: true },
+    });
+
+    const nearbyShopIds: string[] =
+      customer?.lat && customer?.lng
+        ? this.geo
+            .filterByRadius(allShops, customer.lat, customer.lng, radius)
+            .map((s) => (s as any).id as string)
+        : allShops.map((s) => s.id as string);
+
+    const products = await this.productModel.find({
+      shopId: { $in: nearbyShopIds },
+    });
+
+    const q = query.toLowerCase().trim();
+    const scored = products.map((p) => {
+      const name = p.name.toLowerCase();
+      const keywords = ((p.imageKeywords as string[]) || []).map((k) => k.toLowerCase());
+      let score = 0;
+
+      if (name === q) {
+        score = 100;
+      } else {
+        const qTokens = q.split(' ');
+        const nameTokens = name.split(' ');
+
+        const prefixMatches = qTokens.filter((qt) =>
+          nameTokens.some((nt) => nt.startsWith(qt)),
+        ).length;
+        if (prefixMatches > 0) score += (prefixMatches / qTokens.length) * 75;
+
+        const fuzzyScore = this.maxSimilarity(q, name);
+        if (fuzzyScore >= 0.6) score += fuzzyScore * 50;
+
+        const kwMatches = qTokens.filter((qt) =>
+          keywords.some((kw) => kw.includes(qt)),
+        ).length;
+        if (kwMatches === 1) score += 10;
+        else if (kwMatches === 2) score += 30;
+        else if (kwMatches >= 3) score += 50;
+      }
+
+      if (params['minPrice'] && p.price < Number(params['minPrice'])) return null;
+      if (params['maxPrice'] && p.price > Number(params['maxPrice'])) return null;
+      if (params['minRating'] && p.averageRating < Number(params['minRating'])) return null;
+      if (params['maxRating'] && p.averageRating > Number(params['maxRating'])) return null;
+
+      if (score === 0) return null;
+      return { product: p, score };
+    });
+
+    const filtered = scored.filter(Boolean) as { product: any; score: number }[];
+    filtered.sort((a, b) => b.score - a.score);
+
+    const sorted = this.applySort(filtered.map((f) => f.product), params['sort']);
+    const shopMap = new Map<string, any>(allShops.map((s) => [s.id, s]));
+
+    return {
+      query,
+      radius_km: radius / 1000,
+      total: sorted.length,
+      results: sorted.map((p) => {
+        const shop = shopMap.get(p.shopId);
+        const dist =
+          customer?.lat && customer?.lng && shop
+            ? this.geo.haversine(customer.lat, customer.lng, shop.lat, shop.lng)
+            : null;
+        return {
+          productId: p._id,
+          productName: p.name,
+          price: p.price,
+          discountPrice: p.discountPrice,
+          discountPercentage: p.discountPercentage,
+          status: p.status,
+          images: p.images,
+          averageRating: p.averageRating,
+          totalRatings: p.totalRatings,
+          shop: shop
+            ? {
+                shopId: shop.id,
+                shopName: shop.shopName,
+                distance_km: dist ? Math.round((dist / 1000) * 10) / 10 : null,
+              }
+            : null,
+        };
+      }),
+    };
+  }
+
+  async searchInShop(shopId: string, query: string, params: Record<string, string>) {
+    const products = await this.productModel.find({ shopId });
+    const q = query.toLowerCase().trim();
+
+    const scored = products
+      .map((p) => {
+        const name = p.name.toLowerCase();
+        let score = 0;
+
+        if (name === q) score = 100;
+        else {
+          const qTokens = q.split(' ');
+          const nameTokens = name.split(' ');
+          const prefixMatches = qTokens.filter((qt) =>
+            nameTokens.some((nt) => nt.startsWith(qt)),
+          ).length;
+          if (prefixMatches > 0) score += (prefixMatches / qTokens.length) * 75;
+
+          const fuzzyScore = this.maxSimilarity(q, name);
+          if (fuzzyScore >= 0.6) score += fuzzyScore * 50;
+        }
+
+        return score > 0 ? { product: p, score } : null;
+      })
+      .filter(Boolean) as { product: any; score: number }[];
+
+    scored.sort((a, b) => b.score - a.score);
+    return { query, total: scored.length, results: scored.map((s) => s.product) };
+  }
+
+  private applySort(products: any[], sort: string) {
+    if (!sort) return products;
+    const map: Record<string, (a: any, b: any) => number> = {
+      name_asc: (a, b) => a.name.localeCompare(b.name),
+      name_desc: (a, b) => b.name.localeCompare(a.name),
+      price_asc: (a, b) => a.price - b.price,
+      price_desc: (a, b) => b.price - a.price,
+      rating_desc: (a, b) => b.averageRating - a.averageRating,
+      sold_desc: (a, b) => b.totalSold - a.totalSold,
+      date_desc: (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    };
+    return [...products].sort(map[sort] || (() => 0));
+  }
+
+  private levenshtein(a: string, b: string): number {
+    const dp: number[][] = Array.from({ length: a.length + 1 }, (_, i) =>
+      Array.from({ length: b.length + 1 }, (_, j) =>
+        i === 0 ? j : j === 0 ? i : 0,
+      ),
+    );
+    for (let i = 1; i <= a.length; i++) {
+      for (let j = 1; j <= b.length; j++) {
+        dp[i][j] =
+          a[i - 1] === b[j - 1]
+            ? dp[i - 1][j - 1]
+            : 1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]);
+      }
+    }
+    return dp[a.length][b.length];
+  }
+
+  private similarity(a: string, b: string): number {
+    const maxLen = Math.max(a.length, b.length);
+    if (maxLen === 0) return 1;
+    return 1 - this.levenshtein(a, b) / maxLen;
+  }
+
+  private maxSimilarity(query: string, name: string): number {
+    const qTokens = query.split(' ');
+    const nTokens = name.split(' ');
+    let max = 0;
+    for (const qt of qTokens) {
+      for (const nt of nTokens) {
+        const s = this.similarity(qt, nt);
+        if (s > max) max = s;
+      }
+    }
+    return max;
+  }
+}

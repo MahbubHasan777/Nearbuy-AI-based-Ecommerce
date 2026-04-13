@@ -1,0 +1,136 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+
+model AuthToken {
+  id        String   @id @default(uuid())
+  token     String   @unique @db.VarChar(255)
+  userId    String
+  userType  UserType
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId, userType])
+}
+
+enum UserType {
+  ADMIN
+  MODERATOR
+  SHOP
+  CUSTOMER
+}
+
+model Admin {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+}
+
+model Moderator {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+}
+
+model Shop {
+  id           String     @id @default(uuid())
+  ownerName    String
+  ownerEmail   String     @unique
+  passwordHash String
+  shopName     String     @unique
+  shopAddress  String
+  phone        String
+  lat          Float
+  lng          Float
+  status       ShopStatus @default(PENDING)
+  isActive     Boolean    @default(true)
+  profilePic   String?
+  bannerMsg    String?    @db.VarChar(500)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+}
+
+enum ShopStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model Customer {
+  id           String   @id @default(uuid())
+  username     String   @unique
+  email        String   @unique
+  passwordHash String
+  fullName     String
+  address      String
+  gender       Gender
+  phone        String
+  lat          Float?
+  lng          Float?
+  radiusMeters Int      @default(5000)
+  profilePic   String?
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  favouriteShops FavouriteShop[]
+  orderHistory   OrderHistory[]
+  recentShops    RecentShop[]
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+model FavouriteShop {
+  id         String   @id @default(uuid())
+  customerId String
+  shopId     String
+  createdAt  DateTime @default(now())
+
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@unique([customerId, shopId])
+}
+
+model RecentShop {
+  id         String   @id @default(uuid())
+  customerId String
+  shopId     String
+  visitedAt  DateTime @default(now())
+
+  customer Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@unique([customerId, shopId])
+}
+
+model OrderHistory {
+  id          String   @id @default(uuid())
+  customerId  String
+  productId   String
+  shopId      String
+  productName String
+  price       Float
+  markedAt    DateTime @default(now())
+
+  customer Customer @relation(fields: [customerId], references: [id])
+}
+
+model OTP {
+  id        String   @id @default(uuid())
+  email     String
+  otp       String
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
