@@ -5,8 +5,8 @@ import TopNavBar from '@/components/TopNavBar';
 import api from '@/lib/api';
 import Link from 'next/link';
 
-interface Category { id: string; categoryName: string; }
-interface Brand { id: string; brandName: string; }
+interface Category { _id: string; name: string; }
+interface Brand { _id: string; name: string; }
 
 export default function ProductFormPage() {
   const params = useParams<{ id?: string }>();
@@ -66,7 +66,7 @@ export default function ProductFormPage() {
     try {
       const r = await api.post('/shop/categories', { name: newCatName.trim() });
       setCategories(prev => [...prev, r.data]);
-      setForm(f => ({ ...f, categoryId: r.data.id }));
+      setForm(f => ({ ...f, categoryId: r.data._id }));
       setNewCatName('');
       setShowCatInput(false);
     } catch {}
@@ -79,7 +79,7 @@ export default function ProductFormPage() {
     try {
       const r = await api.post('/shop/brands', { name: newBrandName.trim() });
       setBrands(prev => [...prev, r.data]);
-      setForm(f => ({ ...f, brandId: r.data.id }));
+      setForm(f => ({ ...f, brandId: r.data._id }));
       setNewBrandName('');
       setShowBrandInput(false);
     } catch {}
@@ -185,7 +185,7 @@ export default function ProductFormPage() {
                 <select value={form.categoryId} onChange={e => setForm(f => ({ ...f, categoryId: e.target.value }))}
                   className="w-full bg-surface-container-low border border-outline-variant rounded-xl px-4 py-3 text-sm focus:border-primary outline-none">
                   <option value="">Select Category</option>
-                  {categories.map(c => <option key={c.id} value={c.id}>{c.categoryName}</option>)}
+                  {categories.map(c => <option key={c._id} value={c._id}>{c.name}</option>)}
                 </select>
               </div>
 
@@ -208,7 +208,7 @@ export default function ProductFormPage() {
                 <select value={form.brandId} onChange={e => setForm(f => ({ ...f, brandId: e.target.value }))}
                   className="w-full bg-surface-container-low border border-outline-variant rounded-xl px-4 py-3 text-sm focus:border-primary outline-none">
                   <option value="">Select Brand</option>
-                  {brands.map(b => <option key={b.id} value={b.id}>{b.brandName}</option>)}
+                  {brands.map(b => <option key={b._id} value={b._id}>{b.name}</option>)}
                 </select>
               </div>
 
