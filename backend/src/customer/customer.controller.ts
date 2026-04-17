@@ -6,6 +6,7 @@ import {
   Delete,
   Body,
   Param,
+  Query,
   Req,
   UseGuards,
   UseInterceptors,
@@ -77,8 +78,8 @@ export class CustomerController {
   @Get('nearby-shops')
   @UseGuards(TokenGuard, RolesGuard)
   @Roles('CUSTOMER')
-  async nearbyShops(@Req() req: any) {
-    return this.customerService.getNearbyShops(req.user.id);
+  async nearbyShops(@Req() req: any, @Query() query: any) {
+    return this.customerService.getNearbyShops(req.user.id, query);
   }
 
   @Get('favourites')

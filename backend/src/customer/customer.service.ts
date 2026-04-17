@@ -106,11 +106,12 @@ export class CustomerService {
     });
   }
 
-  async getNearbyShops(customerId: string) {
+  async getNearbyShops(customerId: string, query?: any) {
     const customer = await this.prisma.customer.findUnique({ where: { id: customerId } });
-    if (!customer || !customer.lat || !customer.lng) {
-      throw new BadRequestException('Location not set');
-    }
+
+    const lat = query?.lat ? parseFloat(query.lat) : customer?.lat;
+    const lng = query?.lng ? parseFloat(query.lng) : customer?.lng;
+    const radius = query?.radius ? parseFloat(query.radius) : (customer?.radiusMeters ?? 5000);
 
     const shops = await this.prisma.shop.findMany({
       where: { status: 'APPROVED', isActive: true },
@@ -125,7 +126,9 @@ export class CustomerService {
       },
     });
 
-    return this.geo.filterByRadius(shops, customer.lat, customer.lng, customer.radiusMeters);
+    if (!lat || !lng) return shops;
+
+    return this.geo.filterByRadius(shops, lat, lng, radius);
   }
 
   async getFavourites(customerId: string) {
