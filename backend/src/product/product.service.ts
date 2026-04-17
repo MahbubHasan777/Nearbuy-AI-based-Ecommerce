@@ -59,10 +59,22 @@ export class ProductService {
     return product;
   }
 
-  async update(shopId: string, id: string, dto: UpdateProductDto) {
+  async update(shopId: string, id: string, dto: UpdateProductDto, files?: Express.Multer.File[]) {
     const product = await this.productModel.findById(id);
     if (!product) throw new NotFoundException('Product not found');
     if (product.shopId !== shopId) throw new ForbiddenException();
+
+    if (files && files.length > 0) {
+      for (const img of product.images) {
+        this.upload.deleteFile(img);
+      }
+      const imagePaths: string[] = [];
+      for (const file of files) {
+        const path = await this.upload.compressAndSave(file, 'products');
+        imagePaths.push(path);
+      }
+      product.images = imagePaths;
+    }
 
     Object.assign(product, dto);
     return product.save();
@@ -79,6 +91,13 @@ export class ProductService {
 
     await product.deleteOne();
     return { message: 'Product deleted' };
+  }
+
+  async findOne(shopId: string, id: string) {
+    const product = await this.productModel.findById(id);
+    if (!product) throw new NotFoundException('Product not found');
+    if (product.shopId !== shopId) throw new ForbiddenException();
+    return product;
   }
 
   async findById(id: string) {

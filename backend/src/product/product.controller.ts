@@ -31,6 +31,11 @@ export class ProductController {
     return this.productService.findByShop(req.user.id);
   }
 
+  @Get(':id')
+  findOne(@Req() req: any, @Param('id') id: string) {
+    return this.productService.findOne(req.user.id, id);
+  }
+
   @Post()
   @UseInterceptors(FilesInterceptor('images', 3, { storage: memoryStorage() }))
   create(
@@ -42,12 +47,14 @@ export class ProductController {
   }
 
   @Patch(':id')
+  @UseInterceptors(FilesInterceptor('images', 3, { storage: memoryStorage() }))
   update(
     @Req() req: any,
     @Param('id') id: string,
     @Body() dto: UpdateProductDto,
+    @UploadedFiles() files: Express.Multer.File[],
   ) {
-    return this.productService.update(req.user.id, id, dto);
+    return this.productService.update(req.user.id, id, dto, files);
   }
 
   @Delete(':id')
