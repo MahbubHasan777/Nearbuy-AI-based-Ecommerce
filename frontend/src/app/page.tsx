@@ -1,10 +1,11 @@
 'use client';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import TopNavBar from '@/components/TopNavBar';
 import BottomNavBar from '@/components/BottomNavBar';
 import api from '@/lib/api';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
 
 interface Shop {
   id: string;
@@ -20,6 +21,14 @@ export default function CustomerHomePage() {
   const [shops, setShops] = useState<Shop[]>([]);
   const [radius, setRadius] = useState(5000);
   const router = useRouter();
+  const { user, loading } = useAuth();
+
+  useEffect(() => {
+    if (!loading && user) {
+      if (user.role === 'ADMIN') { router.replace('/admin/dashboard'); return; }
+      if (user.role === 'SHOP') { router.replace('/shop/dashboard'); return; }
+    }
+  }, [user, loading]);
 
   useEffect(() => {
     api.get('/customer/nearby-shops', { params: { radius } })

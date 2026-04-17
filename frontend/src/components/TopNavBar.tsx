@@ -31,8 +31,15 @@ export default function TopNavBar({ onSearch, searchValue = '', variant = 'custo
           {variant === 'customer' && (
             <nav className="hidden md:flex gap-6">
               <Link href="/" className="text-primary-container border-b-2 border-primary-container py-5">Home</Link>
-              <Link href="/search" className="text-slate-500 hover:bg-slate-50 transition-colors py-5 px-2">Explore</Link>
-              <Link href="/orders" className="text-slate-500 hover:bg-slate-50 transition-colors py-5 px-2">Orders</Link>
+              <Link href="/search" className="text-slate-500 hover:text-primary-container transition-colors py-5 px-2">Explore</Link>
+              <Link href="/orders" className="text-slate-500 hover:text-primary-container transition-colors py-5 px-2">Orders</Link>
+            </nav>
+          )}
+          {variant === 'shop' && (
+            <nav className="hidden md:flex gap-6">
+              <Link href="/shop/dashboard" className="text-slate-500 hover:text-primary-container py-5 px-2">Dashboard</Link>
+              <Link href="/shop/products" className="text-slate-500 hover:text-primary-container py-5 px-2">Inventory</Link>
+              <Link href="/shop/wishlist-requests" className="text-slate-500 hover:text-primary-container py-5 px-2">Requests</Link>
             </nav>
           )}
         </div>
@@ -51,29 +58,28 @@ export default function TopNavBar({ onSearch, searchValue = '', variant = 'custo
           </form>
         )}
 
-        {variant === 'shop' && (
-          <div className="hidden md:flex flex-1 max-w-md mx-8">
-            <div className="relative w-full">
-              <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
-              <input className="w-full pl-10 pr-4 py-2 bg-surface-container-low border-none rounded-xl focus:ring-2 focus:ring-primary-container text-sm outline-none" placeholder="Search orders or products..." />
-            </div>
-          </div>
-        )}
-
         <div className="flex items-center gap-2">
           <button className="p-2 text-slate-500 hover:bg-slate-50 rounded-full transition-colors">
             <span className="material-symbols-outlined">notifications</span>
           </button>
           {user ? (
-            <button
-              onClick={() => logout()}
-              className="flex items-center gap-2 ml-2 p-1 pr-3 hover:bg-slate-50 rounded-full transition-colors border border-transparent hover:border-slate-100"
-            >
-              <div className="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center text-white font-bold text-xs">
-                {user.name?.charAt(0).toUpperCase() || user.email.charAt(0).toUpperCase()}
+            <div className="flex items-center gap-2">
+              <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-surface-container-low rounded-full">
+                <div className="w-6 h-6 rounded-full bg-primary-container flex items-center justify-center text-white font-bold text-[10px]">
+                  {user.name?.charAt(0).toUpperCase() || user.email.charAt(0).toUpperCase()}
+                </div>
+                <span className="text-xs font-semibold text-on-surface truncate max-w-[100px]">
+                  {user.name || user.email.split('@')[0]}
+                </span>
               </div>
-              <span className="text-sm text-slate-600 hidden md:block">{user.name || user.email}</span>
-            </button>
+              <button
+                onClick={() => logout()}
+                className="flex items-center gap-1.5 px-3 py-2 bg-error-container text-on-error-container rounded-full text-xs font-bold hover:opacity-90 active:scale-95 transition-all"
+              >
+                <span className="material-symbols-outlined text-sm">logout</span>
+                <span className="hidden sm:block">Logout</span>
+              </button>
+            </div>
           ) : (
             <Link href="/login" className="px-4 py-2 bg-primary-container text-white rounded-full text-sm font-semibold hover:bg-primary transition-colors">
               Login

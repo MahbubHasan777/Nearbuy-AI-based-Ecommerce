@@ -15,14 +15,9 @@ export default function ProductFormPage() {
   const productId = isEdit ? params.id : undefined;
 
   const [form, setForm] = useState({
-    productName: '',
-    price: '',
-    discountPrice: '',
-    discountPercentage: '',
-    description: '',
-    categoryId: '',
-    brandId: '',
-    status: 'ACTIVE',
+    productName: '', price: '', discountPrice: '',
+    discountPercentage: '', description: '',
+    categoryId: '', brandId: '', status: 'ACTIVE',
   });
   const [categories, setCategories] = useState<Category[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
@@ -33,9 +28,20 @@ export default function ProductFormPage() {
   const [error, setError] = useState('');
   const fileRef = useRef<HTMLInputElement>(null);
 
+  const [newCatName, setNewCatName] = useState('');
+  const [newBrandName, setNewBrandName] = useState('');
+  const [addingCat, setAddingCat] = useState(false);
+  const [addingBrand, setAddingBrand] = useState(false);
+  const [showCatInput, setShowCatInput] = useState(false);
+  const [showBrandInput, setShowBrandInput] = useState(false);
+
+  const loadCategoriesAndBrands = () => {
+    api.get('/shop/categories').then(r => setCategories(Array.isArray(r.data) ? r.data : [])).catch(() => {});
+    api.get('/shop/brands').then(r => setBrands(Array.isArray(r.data) ? r.data : [])).catch(() => {});
+  };
+
   useEffect(() => {
-    api.get('/categories').then(r => setCategories(r.data)).catch(() => {});
-    api.get('/brands').then(r => setBrands(r.data)).catch(() => {});
+    loadCategoriesAndBrands();
     if (isEdit && productId) {
       api.get(`/products/${productId}`).then(r => {
         const p = r.data;
@@ -53,6 +59,32 @@ export default function ProductFormPage() {
       }).catch(() => {});
     }
   }, [isEdit, productId]);
+
+  const createCategory = async () => {
+    if (!newCatName.trim()) return;
+    setAddingCat(true);
+    try {
+      const r = await api.post('/shop/categories', { name: newCatName.trim() });
+      setCategories(prev => [...prev, r.data]);
+      setForm(f => ({ ...f, categoryId: r.data.id }));
+      setNewCatName('');
+      setShowCatInput(false);
+    } catch {}
+    setAddingCat(false);
+  };
+
+  const createBrand = async () => {
+    if (!newBrandName.trim()) return;
+    setAddingBrand(true);
+    try {
+      const r = await api.post('/shop/brands', { name: newBrandName.trim() });
+      setBrands(prev => [...prev, r.data]);
+      setForm(f => ({ ...f, brandId: r.data.id }));
+      setNewBrandName('');
+      setShowBrandInput(false);
+    } catch {}
+    setAddingBrand(false);
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files ?? []).slice(0, 3);
@@ -75,7 +107,7 @@ export default function ProductFormPage() {
       }
       router.push('/shop/products');
     } catch (err: any) {
-      setError(err?.response?.data?.message ?? 'Something went wrong');
+      setError(err?.response?.data?.message ?? 'Something went wrong. Check all required fields.');
     } finally {
       setLoading(false);
     }
@@ -135,21 +167,51 @@ export default function ProductFormPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="block text-xs font-bold text-outline uppercase tracking-wider mb-2">Category</label>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-xs font-bold text-outline uppercase tracking-wider">Category</label>
+                  <button type="button" onClick={() => setShowCatInput(!showCatInput)} className="text-xs text-primary font-bold hover:underline flex items-center gap-0.5">
+                    <span className="material-symbols-outlined text-xs">add</span> New
+                  </button>
+                </div>
+                {showCatInput && (
+                  <div className="flex gap-1 mb-2">
+                    <input value={newCatName} onChange={e => setNewCatName(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); createCategory(); } }}
+                      className="flex-1 border border-primary rounded-lg px-2 py-1.5 text-xs outline-none" placeholder="Category name" />
+                    <button type="button" onClick={createCategory} disabled={addingCat} className="px-2 py-1.5 bg-primary-container text-white rounded-lg text-xs font-bold">
+                      {addingCat ? '...' : 'Add'}
+                    </button>
+                  </div>
+                )}
                 <select value={form.categoryId} onChange={e => setForm(f => ({ ...f, categoryId: e.target.value }))}
                   className="w-full bg-surface-container-low border border-outline-variant rounded-xl px-4 py-3 text-sm focus:border-primary outline-none">
                   <option value="">Select Category</option>
                   {categories.map(c => <option key={c.id} value={c.id}>{c.categoryName}</option>)}
                 </select>
               </div>
+
               <div>
-                <label className="block text-xs font-bold text-outline uppercase tracking-wider mb-2">Brand</label>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-xs font-bold text-outline uppercase tracking-wider">Brand</label>
+                  <button type="button" onClick={() => setShowBrandInput(!showBrandInput)} className="text-xs text-primary font-bold hover:underline flex items-center gap-0.5">
+                    <span className="material-symbols-outlined text-xs">add</span> New
+                  </button>
+                </div>
+                {showBrandInput && (
+                  <div className="flex gap-1 mb-2">
+                    <input value={newBrandName} onChange={e => setNewBrandName(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); createBrand(); } }}
+                      className="flex-1 border border-primary rounded-lg px-2 py-1.5 text-xs outline-none" placeholder="Brand name" />
+                    <button type="button" onClick={createBrand} disabled={addingBrand} className="px-2 py-1.5 bg-primary-container text-white rounded-lg text-xs font-bold">
+                      {addingBrand ? '...' : 'Add'}
+                    </button>
+                  </div>
+                )}
                 <select value={form.brandId} onChange={e => setForm(f => ({ ...f, brandId: e.target.value }))}
                   className="w-full bg-surface-container-low border border-outline-variant rounded-xl px-4 py-3 text-sm focus:border-primary outline-none">
                   <option value="">Select Brand</option>
                   {brands.map(b => <option key={b.id} value={b.id}>{b.brandName}</option>)}
                 </select>
               </div>
+
               <div>
                 <label className="block text-xs font-bold text-outline uppercase tracking-wider mb-2">Status</label>
                 <select value={form.status} onChange={e => setForm(f => ({ ...f, status: e.target.value }))}
@@ -164,8 +226,7 @@ export default function ProductFormPage() {
 
           <div className="bg-white rounded-2xl shadow-card border border-slate-100 p-6">
             <h2 className="text-lg font-bold text-on-surface border-b border-slate-100 pb-3 mb-5">
-              Product Gallery
-              <span className="text-xs font-normal text-outline ml-2">(Max 3 images)</span>
+              Product Gallery <span className="text-xs font-normal text-outline ml-2">(Max 3 images)</span>
             </h2>
 
             {existingImages.length > 0 && (
@@ -181,10 +242,8 @@ export default function ProductFormPage() {
               </div>
             )}
 
-            <div
-              onClick={() => fileRef.current?.click()}
-              className="border-2 border-dashed border-outline-variant rounded-2xl p-8 flex flex-col items-center justify-center cursor-pointer hover:border-primary hover:bg-surface-container-low transition-all group"
-            >
+            <div onClick={() => fileRef.current?.click()}
+              className="border-2 border-dashed border-outline-variant rounded-2xl p-8 flex flex-col items-center justify-center cursor-pointer hover:border-primary hover:bg-surface-container-low transition-all group">
               <span className="material-symbols-outlined text-4xl text-outline group-hover:text-primary transition-colors mb-3">add_a_photo</span>
               <p className="text-sm font-semibold text-on-surface-variant">Click to upload images</p>
               <p className="text-xs text-outline mt-1">PNG, JPG up to 10MB each</p>
@@ -196,18 +255,14 @@ export default function ProductFormPage() {
                 {previews.map((src, i) => (
                   <div key={i} className="relative w-24 h-24 rounded-xl overflow-hidden border-2 border-primary-container">
                     <img src={src} className="w-full h-full object-cover" alt="" />
-                    {i === 0 && (
-                      <span className="absolute bottom-0 left-0 right-0 bg-primary-container text-white text-[9px] font-bold text-center py-0.5">PRIMARY</span>
-                    )}
+                    {i === 0 && <span className="absolute bottom-0 left-0 right-0 bg-primary-container text-white text-[9px] font-bold text-center py-0.5">PRIMARY</span>}
                   </div>
                 ))}
               </div>
             )}
           </div>
 
-          {error && (
-            <div className="bg-error-container text-on-error-container rounded-xl px-4 py-3 text-sm font-medium">{error}</div>
-          )}
+          {error && <div className="bg-error-container text-on-error-container rounded-xl px-4 py-3 text-sm font-medium">{error}</div>}
 
           <div className="flex gap-3 pb-8">
             <Link href="/shop/products" className="flex-1 py-4 border border-outline-variant rounded-xl font-semibold text-on-surface hover:bg-surface-container transition-colors text-center text-sm">
