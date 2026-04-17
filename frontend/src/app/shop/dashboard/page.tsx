@@ -2,18 +2,12 @@
 import { useEffect, useState } from 'react';
 import TopNavBar from '@/components/TopNavBar';
 import BottomNavBar from '@/components/BottomNavBar';
+import ShopSidebar from '@/components/ShopSidebar';
 import api from '@/lib/api';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 
-const sideNav = [
-  { href: '/shop/dashboard', icon: 'dashboard', label: 'Dashboard', active: true },
-  { href: '/shop/products', icon: 'inventory_2', label: 'Inventory' },
-  { href: '/shop/wishlist-requests', icon: 'heart_plus', label: 'Wishlist Requests' },
-  { href: '/shop/categories', icon: 'category', label: 'Categories' },
-  { href: '/shop/brands', icon: 'label', label: 'Brands' },
-  { href: '/shop/profile', icon: 'settings', label: 'Settings' },
-];
+
 
 interface WishlistItem {
   _id: string;
@@ -65,32 +59,7 @@ export default function ShopDashboardPage() {
       <TopNavBar variant="shop" />
 
       <div className="flex flex-1 w-full max-w-[1440px] mx-auto">
-        <aside className="hidden lg:flex flex-col h-[calc(100vh-64px)] w-64 border-r bg-slate-50 py-6 sticky top-16">
-          <div className="px-6 mb-8 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-white font-bold text-sm">
-              {shopName.charAt(0).toUpperCase()}
-            </div>
-            <div>
-              <h3 className="text-sm font-bold text-slate-900 leading-tight">{shopName}</h3>
-              <p className="text-[10px] text-slate-500 uppercase tracking-wider">Local Partner</p>
-            </div>
-          </div>
-          <nav className="flex-1 space-y-1">
-            {sideNav.map(item => (
-              <Link key={item.href} href={item.href}
-                className={`flex items-center px-6 py-3 transition-all duration-150 text-sm ${item.active ? 'text-primary-container bg-blue-50 border-r-4 border-primary-container font-semibold' : 'text-slate-600 hover:text-primary-container hover:bg-blue-50/50'}`}>
-                <span className="material-symbols-outlined mr-3">{item.icon}</span>
-                {item.label}
-              </Link>
-            ))}
-          </nav>
-          <div className="px-4 mt-auto">
-            <Link href="/shop/products/new" className="w-full py-3 bg-primary-container text-white rounded-xl font-bold text-sm shadow-lg flex items-center justify-center gap-2 hover:bg-primary transition-colors">
-              <span className="material-symbols-outlined text-sm">add</span>
-              Add New Product
-            </Link>
-          </div>
-        </aside>
+        <ShopSidebar shopName={shopName} />
 
         <main className="flex-1 p-6 lg:p-8 overflow-y-auto space-y-8">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">

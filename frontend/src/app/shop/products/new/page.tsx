@@ -43,7 +43,7 @@ export default function ProductFormPage() {
   useEffect(() => {
     loadCategoriesAndBrands();
     if (isEdit && productId) {
-      api.get(`/products/${productId}`).then(r => {
+      api.get(`/shop/products/${productId}`).then(r => {
         const p = r.data;
         setForm({
           productName: p.productName,
@@ -101,9 +101,9 @@ export default function ProductFormPage() {
       Object.entries(form).forEach(([k, v]) => { if (v) fd.append(k, v); });
       images.forEach(img => fd.append('images', img));
       if (isEdit && productId) {
-        await api.patch(`/products/${productId}`, fd, { headers: { 'Content-Type': 'multipart/form-data' } });
+        await api.patch(`/shop/products/${productId}`, fd, { headers: { 'Content-Type': 'multipart/form-data' } });
       } else {
-        await api.post('/products', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
+        await api.post('/shop/products', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
       }
       router.push('/shop/products');
     } catch (err: any) {

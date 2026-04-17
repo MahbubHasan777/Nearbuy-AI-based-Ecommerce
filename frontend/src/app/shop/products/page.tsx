@@ -2,15 +2,9 @@
 import { useEffect, useState } from 'react';
 import TopNavBar from '@/components/TopNavBar';
 import BottomNavBar from '@/components/BottomNavBar';
+import ShopSidebar from '@/components/ShopSidebar';
 import Link from 'next/link';
 import api from '@/lib/api';
-
-const sideNav = [
-  { href: '/shop/dashboard', icon: 'dashboard', label: 'Dashboard' },
-  { href: '/shop/products', icon: 'inventory_2', label: 'Inventory', active: true },
-  { href: '/shop/wishlist-requests', icon: 'heart_plus', label: 'Wishlist Requests' },
-  { href: '/shop/profile', icon: 'settings', label: 'Settings' },
-];
 
 interface Product {
   id: string;
@@ -30,16 +24,20 @@ export default function ShopProductsPage() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [shopName, setShopName] = useState('Your Shop');
 
   const fetchProducts = () => {
     setLoading(true);
-    api.get('/shop/products').then(r => setProducts(r.data)).catch(() => {}).finally(() => setLoading(false));
+    api.get('/shop/products').then(r => setProducts(Array.isArray(r.data) ? r.data : [])).catch(() => {}).finally(() => setLoading(false));
   };
 
-  useEffect(() => { fetchProducts(); }, []);
+  useEffect(() => {
+    fetchProducts();
+    api.get('/shop/profile').then(r => setShopName(r.data?.shopName ?? 'Your Shop')).catch(() => {});
+  }, []);
 
   const deleteProduct = async (id: string) => {
-    await api.delete(`/products/${id}`);
+    await api.delete(`/shop/products/${id}`);
     setProducts(prev => prev.filter(p => p.id !== id));
     setDeleteId(null);
   };
@@ -55,27 +53,7 @@ export default function ShopProductsPage() {
     <div className="min-h-screen bg-background font-sans">
       <TopNavBar variant="shop" />
       <div className="flex w-full max-w-[1440px] mx-auto">
-        <aside className="hidden lg:flex flex-col h-[calc(100vh-64px)] w-64 border-r bg-slate-50 py-6 sticky top-16">
-          <div className="px-6 mb-8">
-            <h2 className="text-lg font-black text-primary-container tracking-tight">NearBuy Shop</h2>
-            <p className="text-xs text-slate-500">Management Panel</p>
-          </div>
-          <nav className="flex-1 space-y-1">
-            {sideNav.map(item => (
-              <Link key={item.href} href={item.href}
-                className={`flex items-center px-6 py-3 transition-all duration-150 text-sm ${item.active ? 'text-primary-container bg-blue-50 border-r-4 border-primary-container font-semibold' : 'text-slate-600 hover:text-primary-container hover:bg-blue-50/50'}`}
-              >
-                <span className="material-symbols-outlined mr-3">{item.icon}</span>
-                {item.label}
-              </Link>
-            ))}
-          </nav>
-          <div className="px-4">
-            <Link href="/shop/products/new" className="w-full py-3 bg-primary-container text-white rounded-xl font-bold text-sm flex items-center justify-center gap-2 hover:bg-primary transition-colors">
-              <span className="material-symbols-outlined text-sm">add</span> Add Product
-            </Link>
-          </div>
-        </aside>
+        <ShopSidebar shopName={shopName} />
 
         <main className="flex-1 p-6 lg:p-8">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
@@ -84,10 +62,6 @@ export default function ShopProductsPage() {
               <p className="text-outline mt-1">Manage your shop&apos;s product catalog</p>
             </div>
             <div className="flex items-center gap-3">
-              <button className="flex items-center gap-2 px-4 py-2 bg-surface-container border border-outline-variant rounded-xl text-sm font-semibold text-on-surface-variant hover:bg-surface-container-high transition-colors">
-                <span className="material-symbols-outlined text-xl">file_download</span>
-                Export
-              </button>
               <Link href="/shop/products/new" className="flex items-center gap-2 px-5 py-2.5 bg-primary-container text-white rounded-xl font-bold text-sm shadow-lg hover:bg-primary transition-colors">
                 <span className="material-symbols-outlined text-sm">add_circle</span>
                 New Product
@@ -131,7 +105,7 @@ export default function ShopProductsPage() {
                   </thead>
                   <tbody className="divide-y divide-slate-100">
                     {loading && (
-                      <tr><td colSpan={6} className="py-16 text-center text-on-surface-variant">
+                      <tr><td colSpan={6} className="py-16 text-center">
                         <div className="w-8 h-8 border-4 border-primary-container border-t-transparent rounded-full animate-spin mx-auto" />
                       </td></tr>
                     )}
@@ -169,7 +143,7 @@ export default function ShopProductsPage() {
                         <td className="px-6 py-4">
                           <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold ${
                             p.status === 'ACTIVE' ? 'bg-green-100 text-green-700' :
-                            p.status === 'OUT_OF_STOCK' ? 'bg-error-container text-on-error-container' :
+                            p.status === 'OUT_OF_STOCK' ? 'bg-red-100 text-red-700' :
                             'bg-slate-100 text-slate-600'
                           }`}>{p.status}</span>
                         </td>
@@ -207,20 +181,11 @@ export default function ShopProductsPage() {
               </div>
 
               <div className="bg-white rounded-2xl p-5 shadow-card border border-slate-100">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-outline mb-3">Quick Add</h4>
-                <Link href="/shop/products/new"
-                  className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-outline-variant rounded-xl text-outline hover:border-primary hover:text-primary transition-all cursor-pointer">
-                  <span className="material-symbols-outlined text-3xl mb-2">add_a_photo</span>
-                  <span className="text-xs font-semibold">Upload Product</span>
-                </Link>
-              </div>
-
-              <div className="bg-white rounded-2xl p-5 shadow-card border border-slate-100">
                 <h4 className="text-xs font-bold uppercase tracking-wider text-outline mb-3">Stock Status</h4>
                 <div className="space-y-2">
                   {[
                     { label: 'Active', count: products.filter(p => p.status === 'ACTIVE').length, color: 'bg-green-500' },
-                    { label: 'Out of Stock', count: products.filter(p => p.status === 'OUT_OF_STOCK').length, color: 'bg-error' },
+                    { label: 'Out of Stock', count: products.filter(p => p.status === 'OUT_OF_STOCK').length, color: 'bg-red-500' },
                     { label: 'Disabled', count: products.filter(p => p.status === 'DISABLED').length, color: 'bg-slate-400' },
                   ].map(s => (
                     <div key={s.label} className="flex items-center justify-between">
@@ -245,19 +210,14 @@ export default function ShopProductsPage() {
               <span className="material-symbols-outlined text-error">delete</span>
             </div>
             <h3 className="text-lg font-bold text-on-surface text-center mb-2">Delete Product?</h3>
-            <p className="text-sm text-on-surface-variant text-center mb-6">This action cannot be undone. The product will be permanently removed.</p>
+            <p className="text-sm text-on-surface-variant text-center mb-6">This action cannot be undone.</p>
             <div className="flex gap-3">
-              <button onClick={() => setDeleteId(null)} className="flex-1 py-3 border border-outline-variant rounded-xl font-semibold text-sm hover:bg-surface-container transition-colors">
-                Cancel
-              </button>
-              <button onClick={() => deleteProduct(deleteId)} className="flex-1 py-3 bg-error text-white rounded-xl font-bold text-sm hover:opacity-90 active:scale-95 transition-all">
-                Delete
-              </button>
+              <button onClick={() => setDeleteId(null)} className="flex-1 py-3 border border-outline-variant rounded-xl font-semibold text-sm hover:bg-surface-container transition-colors">Cancel</button>
+              <button onClick={() => deleteProduct(deleteId)} className="flex-1 py-3 bg-error text-white rounded-xl font-bold text-sm hover:opacity-90 active:scale-95 transition-all">Delete</button>
             </div>
           </div>
         </div>
       )}
-
       <BottomNavBar variant="shop" />
     </div>
   );

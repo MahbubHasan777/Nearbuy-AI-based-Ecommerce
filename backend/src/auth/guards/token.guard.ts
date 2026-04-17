@@ -12,7 +12,15 @@ export class TokenGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    const token = request.cookies?.['auth_token'];
+
+    let token: string | undefined = request.cookies?.['auth_token'];
+
+    if (!token) {
+      const authHeader: string = request.headers?.['authorization'] ?? '';
+      if (authHeader.startsWith('Bearer ')) {
+        token = authHeader.slice(7);
+      }
+    }
 
     if (!token) throw new UnauthorizedException('No token provided');
 
