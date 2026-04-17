@@ -8,14 +8,13 @@ import api from '@/lib/api';
 
 interface Product {
   id: string;
-  productName: string;
+  name: string;
   price: number;
   discountPrice?: number;
-  discountPercentage?: number;
   images: string[];
   status: string;
-  category?: { categoryName: string };
-  brand?: { brandName: string };
+  category?: { name: string };
+  brand?: { name: string };
 }
 
 export default function ShopProductsPage() {
@@ -44,7 +43,7 @@ export default function ShopProductsPage() {
 
   const BASE = 'http://localhost:3001/';
   const filtered = products.filter(p => {
-    const matchSearch = p.productName.toLowerCase().includes(search.toLowerCase());
+    const matchSearch = (p.name ?? '').toLowerCase().includes(search.toLowerCase());
     const matchStatus = statusFilter ? p.status === statusFilter : true;
     return matchSearch && matchStatus;
   });
@@ -82,9 +81,8 @@ export default function ShopProductsPage() {
               <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)}
                 className="w-full py-3 px-4 bg-white border border-outline-variant rounded-xl text-sm outline-none focus:border-primary">
                 <option value="">All Status</option>
-                <option value="ACTIVE">Active</option>
+                <option value="IN_STOCK">In Stock</option>
                 <option value="OUT_OF_STOCK">Out of Stock</option>
-                <option value="DISABLED">Disabled</option>
               </select>
             </div>
           </div>
@@ -131,18 +129,18 @@ export default function ShopProductsPage() {
                                 </div>
                               )}
                             </div>
-                            <p className="text-sm font-semibold text-on-surface">{p.productName}</p>
+                            <p className="text-sm font-semibold text-on-surface">{p.name}</p>
                           </div>
                         </td>
-                        <td className="px-6 py-4 text-sm text-on-surface-variant">{p.category?.categoryName ?? '—'}</td>
-                        <td className="px-6 py-4 text-sm text-on-surface-variant">{p.brand?.brandName ?? '—'}</td>
+                        <td className="px-6 py-4 text-sm text-on-surface-variant">{p.category?.name ?? '—'}</td>
+                        <td className="px-6 py-4 text-sm text-on-surface-variant">{p.brand?.name ?? '—'}</td>
                         <td className="px-6 py-4 text-sm text-on-surface font-semibold text-right">
                           ${(p.discountPrice ?? p.price).toFixed(2)}
                           {p.discountPrice && <span className="ml-1 line-through text-outline text-xs">${p.price.toFixed(2)}</span>}
                         </td>
                         <td className="px-6 py-4">
                           <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold ${
-                            p.status === 'ACTIVE' ? 'bg-green-100 text-green-700' :
+                            p.status === 'IN_STOCK' ? 'bg-green-100 text-green-700' :
                             p.status === 'OUT_OF_STOCK' ? 'bg-red-100 text-red-700' :
                             'bg-slate-100 text-slate-600'
                           }`}>{p.status}</span>
@@ -174,7 +172,7 @@ export default function ShopProductsPage() {
                   <h3 className="text-4xl font-bold mt-2">{products.length}</h3>
                   <div className="flex items-center gap-1 mt-4 text-xs">
                     <span className="material-symbols-outlined text-sm">inventory_2</span>
-                    <span>{products.filter(p => p.status === 'ACTIVE').length} active</span>
+                    <span>{products.filter(p => p.status === 'IN_STOCK').length} in stock</span>
                   </div>
                 </div>
                 <div className="absolute -right-8 -bottom-8 w-28 h-28 bg-white/10 rounded-full" />
@@ -184,7 +182,7 @@ export default function ShopProductsPage() {
                 <h4 className="text-xs font-bold uppercase tracking-wider text-outline mb-3">Stock Status</h4>
                 <div className="space-y-2">
                   {[
-                    { label: 'Active', count: products.filter(p => p.status === 'ACTIVE').length, color: 'bg-green-500' },
+                    { label: 'In Stock', count: products.filter(p => p.status === 'IN_STOCK').length, color: 'bg-green-500' },
                     { label: 'Out of Stock', count: products.filter(p => p.status === 'OUT_OF_STOCK').length, color: 'bg-red-500' },
                     { label: 'Disabled', count: products.filter(p => p.status === 'DISABLED').length, color: 'bg-slate-400' },
                   ].map(s => (

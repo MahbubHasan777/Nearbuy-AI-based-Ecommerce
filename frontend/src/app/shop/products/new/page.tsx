@@ -15,9 +15,9 @@ export default function ProductFormPage() {
   const productId = isEdit ? params.id : undefined;
 
   const [form, setForm] = useState({
-    productName: '', price: '', discountPrice: '',
+    name: '', price: '', discountPrice: '',
     discountPercentage: '', description: '',
-    categoryId: '', brandId: '', status: 'ACTIVE',
+    categoryId: '', brandId: '', status: 'IN_STOCK',
   });
   const [categories, setCategories] = useState<Category[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
@@ -46,14 +46,14 @@ export default function ProductFormPage() {
       api.get(`/shop/products/${productId}`).then(r => {
         const p = r.data;
         setForm({
-          productName: p.productName,
+          name: p.name,
           price: String(p.price),
           discountPrice: String(p.discountPrice ?? ''),
           discountPercentage: String(p.discountPercentage ?? ''),
           description: p.description ?? '',
-          categoryId: p.category?.id ?? '',
-          brandId: p.brand?.id ?? '',
-          status: p.status,
+          categoryId: p.category?._id ?? p.categoryId ?? '',
+          brandId: p.brand?._id ?? p.brandId ?? '',
+          status: p.status ?? 'IN_STOCK',
         });
         setExistingImages(p.images ?? []);
       }).catch(() => {});
@@ -98,7 +98,14 @@ export default function ProductFormPage() {
     setLoading(true);
     try {
       const fd = new FormData();
-      Object.entries(form).forEach(([k, v]) => { if (v) fd.append(k, v); });
+      fd.append('name', form.name);
+      fd.append('price', form.price);
+      if (form.discountPrice) fd.append('discountPrice', form.discountPrice);
+      if (form.discountPercentage) fd.append('discountPercentage', form.discountPercentage);
+      if (form.description) fd.append('description', form.description);
+      if (form.categoryId) fd.append('categoryId', form.categoryId);
+      if (form.brandId) fd.append('brandId', form.brandId);
+      if (form.status) fd.append('status', form.status);
       images.forEach(img => fd.append('images', img));
       if (isEdit && productId) {
         await api.patch(`/shop/products/${productId}`, fd, { headers: { 'Content-Type': 'multipart/form-data' } });
@@ -107,7 +114,8 @@ export default function ProductFormPage() {
       }
       router.push('/shop/products');
     } catch (err: any) {
-      setError(err?.response?.data?.message ?? 'Something went wrong. Check all required fields.');
+      const msg = err?.response?.data?.message;
+      setError(Array.isArray(msg) ? msg.join(', ') : (msg ?? 'Something went wrong.'));
     } finally {
       setLoading(false);
     }
@@ -135,7 +143,7 @@ export default function ProductFormPage() {
 
             <div>
               <label className="block text-xs font-bold text-outline uppercase tracking-wider mb-2">Product Name *</label>
-              <input required value={form.productName} onChange={e => setForm(f => ({ ...f, productName: e.target.value }))}
+              <input required value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
                 className="w-full bg-surface-container-low border border-outline-variant rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
                 placeholder="e.g. Fresh Organic Apples" />
             </div>
@@ -216,9 +224,8 @@ export default function ProductFormPage() {
                 <label className="block text-xs font-bold text-outline uppercase tracking-wider mb-2">Status</label>
                 <select value={form.status} onChange={e => setForm(f => ({ ...f, status: e.target.value }))}
                   className="w-full bg-surface-container-low border border-outline-variant rounded-xl px-4 py-3 text-sm focus:border-primary outline-none">
-                  <option value="ACTIVE">Active</option>
+                  <option value="IN_STOCK">In Stock</option>
                   <option value="OUT_OF_STOCK">Out of Stock</option>
-                  <option value="DISABLED">Disabled</option>
                 </select>
               </div>
             </div>
