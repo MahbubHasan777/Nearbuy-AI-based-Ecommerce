@@ -7,7 +7,7 @@ import Link from 'next/link';
 import api from '@/lib/api';
 
 interface Product {
-  id: string;
+  _id: string;
   name: string;
   price: number;
   discountPrice?: number;
@@ -37,11 +37,11 @@ export default function ShopProductsPage() {
 
   const deleteProduct = async (id: string) => {
     await api.delete(`/shop/products/${id}`);
-    setProducts(prev => prev.filter(p => p.id !== id));
+    setProducts(prev => prev.filter(p => p._id !== id));
     setDeleteId(null);
   };
 
-  const BASE = 'http://localhost:3001/';
+  const BASE = 'http://localhost:3001/uploads/';
   const filtered = products.filter(p => {
     const matchSearch = (p.name ?? '').toLowerCase().includes(search.toLowerCase());
     const matchStatus = statusFilter ? p.status === statusFilter : true;
@@ -117,7 +117,7 @@ export default function ShopProductsPage() {
                       </td></tr>
                     )}
                     {filtered.map(p => (
-                      <tr key={p.id} className="hover:bg-slate-50 transition-colors group">
+                      <tr key={p._id} className="hover:bg-slate-50 transition-colors group">
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
                             <div className="w-12 h-12 rounded-lg bg-surface-container overflow-hidden flex-shrink-0 border border-slate-100">
@@ -147,10 +147,10 @@ export default function ShopProductsPage() {
                         </td>
                         <td className="px-6 py-4 text-right">
                           <div className="flex items-center justify-end gap-1">
-                            <Link href={`/shop/products/${p.id}/edit`} className="p-2 hover:bg-primary-container/10 rounded-lg text-outline group-hover:text-primary transition-colors">
+                            <Link href={`/shop/products/${p._id}/edit`} className="p-2 hover:bg-primary-container/10 rounded-lg text-outline group-hover:text-primary transition-colors">
                               <span className="material-symbols-outlined">edit</span>
                             </Link>
-                            <button onClick={() => setDeleteId(p.id)} className="p-2 hover:bg-error-container/10 rounded-lg text-outline hover:text-error transition-colors">
+                            <button onClick={() => setDeleteId(p._id)} className="p-2 hover:bg-error-container/10 rounded-lg text-outline hover:text-error transition-colors">
                               <span className="material-symbols-outlined">delete</span>
                             </button>
                           </div>

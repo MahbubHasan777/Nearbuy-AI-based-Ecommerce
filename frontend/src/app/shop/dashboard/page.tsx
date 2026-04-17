@@ -52,7 +52,7 @@ export default function ShopDashboardPage() {
   }, []);
 
   const pending = wishlist.filter(w => w.status === 'PENDING');
-  const BASE = 'http://localhost:3001/';
+  const BASE = 'http://localhost:3001/uploads/';
 
   return (
     <div className="min-h-screen bg-background font-sans text-on-background flex flex-col">
