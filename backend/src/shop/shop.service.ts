@@ -64,6 +64,23 @@ export class ShopService {
     return shop;
   }
 
+  async getPublicProfile(shopId: string) {
+    const shop = await this.prisma.shop.findUnique({
+      where: { id: shopId, status: 'APPROVED' },
+      select: {
+        id: true,
+        shopName: true,
+        shopAddress: true,
+        profilePic: true,
+        bannerMsg: true,
+        lat: true,
+        lng: true,
+      },
+    });
+    if (!shop) throw new NotFoundException('Shop not found');
+    return shop;
+  }
+
   async updateProfile(shopId: string, dto: UpdateShopDto) {
     return this.prisma.shop.update({
       where: { id: shopId },

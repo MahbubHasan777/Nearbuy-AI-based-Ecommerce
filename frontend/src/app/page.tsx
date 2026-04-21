@@ -1,11 +1,14 @@
 'use client';
 import { useEffect, useState, useCallback } from 'react';
+import dynamic from 'next/dynamic';
 import TopNavBar from '@/components/TopNavBar';
 import BottomNavBar from '@/components/BottomNavBar';
 import api from '@/lib/api';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
+
+const LocationPicker = dynamic(() => import('@/components/LocationPicker'), { ssr: false });
 
 interface Shop {
   id: string;
@@ -26,6 +29,9 @@ export default function CustomerHomePage() {
   const [userLat, setUserLat] = useState<number | null>(null);
   const [userLng, setUserLng] = useState<number | null>(null);
   const [search, setSearch] = useState('');
+  const [showMapPicker, setShowMapPicker] = useState(false);
+  const [pickerLat, setPickerLat] = useState(23.8103);
+  const [pickerLng, setPickerLng] = useState(90.4125);
   const router = useRouter();
   const { user, loading } = useAuth();
 
@@ -68,6 +74,14 @@ export default function CustomerHomePage() {
       );
     }
   }, [user, loading]);
+
+  const savePickedLocation = async () => {
+    setUserLat(pickerLat); setUserLng(pickerLng);
+    setLocationStatus('granted');
+    setShowMapPicker(false);
+    fetchShops(pickerLat, pickerLng, radius);
+    api.patch('/customer/location', { lat: pickerLat, lng: pickerLng }).catch(() => {});
+  };
 
   useEffect(() => {
     if (locationStatus === 'granted' && userLat && userLng) {
@@ -153,11 +167,21 @@ export default function CustomerHomePage() {
                  locationStatus === 'pending' ? 'Getting your location...' : 'Location'}
               </p>
               <p className="text-xs text-outline">
-                {locationStatus === 'granted' ? 'Showing shops sorted by distance' :
-                 locationStatus === 'denied' ? 'Showing all nearby shops' :
-                 'Allow location for better results'}
+                {locationStatus === 'granted' ? 'Shops sorted by distance' :
+                 locationStatus === 'denied' ? 'Showing all shops' :
+                 'Allow for better results'}
               </p>
             </div>
+            <button
+              onClick={() => {
+                if (userLat && userLng) { setPickerLat(userLat); setPickerLng(userLng); }
+                setShowMapPicker(true);
+              }}
+              className="flex-shrink-0 p-2 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors"
+              title="Pick location on map"
+            >
+              <span className="material-symbols-outlined text-sm text-primary">map</span>
+            </button>
           </div>
 
           {/* Search */}
@@ -303,6 +327,43 @@ export default function CustomerHomePage() {
           )}
         </div>
       </main>
+
+      {/* Map Location Picker Modal */}
+      {showMapPicker && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
+              <div>
+                <h3 className="font-bold text-on-surface text-lg">Pick Your Location</h3>
+                <p className="text-xs text-outline mt-0.5">Click on the map or drag the pin to set your location</p>
+              </div>
+              <button onClick={() => setShowMapPicker(false)} className="p-2 hover:bg-slate-100 rounded-xl transition-colors">
+                <span className="material-symbols-outlined text-on-surface-variant">close</span>
+              </button>
+            </div>
+            <div className="h-72 w-full relative">
+              <LocationPicker
+                lat={pickerLat}
+                lng={pickerLng}
+                onChange={(lat, lng) => { setPickerLat(lat); setPickerLng(lng); }}
+              />
+            </div>
+            <div className="px-6 py-4 border-t border-slate-100 flex items-center justify-between">
+              <p className="text-xs text-outline">
+                📍 {pickerLat.toFixed(4)}, {pickerLng.toFixed(4)}
+              </p>
+              <div className="flex gap-3">
+                <button onClick={() => setShowMapPicker(false)} className="px-4 py-2 border border-outline-variant rounded-xl text-sm font-semibold">
+                  Cancel
+                </button>
+                <button onClick={savePickedLocation} className="px-6 py-2 bg-primary-container text-white rounded-xl text-sm font-bold shadow hover:bg-primary transition-colors">
+                  Use This Location
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <BottomNavBar variant="customer" />
     </div>

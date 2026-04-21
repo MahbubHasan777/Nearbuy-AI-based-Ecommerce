@@ -5,12 +5,16 @@ import {
   Patch,
   Delete,
   Body,
+  Param,
+  Query,
   Req,
   UseGuards,
   UseInterceptors,
   UploadedFile,
   HttpCode,
 } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
 import { ShopService } from './shop.service';
@@ -20,10 +24,24 @@ import { ShopMessageDto } from './dto/shop-message.dto';
 import { TokenGuard } from '../auth/guards/token.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
+import { Product } from '../product/schemas/product.schema';
 
 @Controller('shop')
 export class ShopController {
-  constructor(private shopService: ShopService) {}
+  constructor(
+    private shopService: ShopService,
+    @InjectModel(Product.name) private productModel: Model<any>,
+  ) {}
+
+  @Get('public/:id')
+  async getPublicShop(@Param('id') id: string) {
+    return this.shopService.getPublicProfile(id);
+  }
+
+  @Get('public/:id/products')
+  async getPublicProducts(@Param('id') id: string, @Query('sort') sort?: string) {
+    return this.productModel.find({ shopId: id, status: 'IN_STOCK' }).sort({ createdAt: -1 });
+  }
 
   @Post('register')
   async register(@Body() dto: CreateShopDto) {

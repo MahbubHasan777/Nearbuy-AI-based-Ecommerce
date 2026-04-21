@@ -4,9 +4,10 @@ import { ShopService } from './shop.service';
 import { PrismaModule } from '../prisma/prisma.module';
 import { UploadModule } from '../upload/upload.module';
 import { AuthModule } from '../auth/auth.module';
+import { ProductModule } from '../product/product.module';
 
 @Module({
-  imports: [PrismaModule, UploadModule, AuthModule],
+  imports: [PrismaModule, UploadModule, AuthModule, ProductModule],
   controllers: [ShopController],
   providers: [ShopService],
   exports: [ShopService],
