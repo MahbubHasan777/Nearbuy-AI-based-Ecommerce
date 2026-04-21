@@ -1,11 +1,8 @@
-from chromadb import HttpClient
+from chromadb import PersistentClient
 from chromadb.utils import embedding_functions
 import os
 
-CHROMA_HOST = os.getenv("CHROMA_HOST", "localhost")
-CHROMA_PORT = int(os.getenv("CHROMA_PORT", "8000"))
-
-client = HttpClient(host=CHROMA_HOST, port=CHROMA_PORT)
+client = PersistentClient(path="./chroma_db")
 
 ef = embedding_functions.SentenceTransformerEmbeddingFunction(
     model_name="all-MiniLM-L6-v2"
