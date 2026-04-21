@@ -5,9 +5,10 @@ import { PrismaModule } from '../prisma/prisma.module';
 import { GeoModule } from '../geo/geo.module';
 import { UploadModule } from '../upload/upload.module';
 import { AuthModule } from '../auth/auth.module';
+import { ProductModule } from '../product/product.module';
 
 @Module({
-  imports: [PrismaModule, GeoModule, UploadModule, AuthModule],
+  imports: [PrismaModule, GeoModule, UploadModule, AuthModule, ProductModule],
   controllers: [CustomerController],
   providers: [CustomerService],
   exports: [CustomerService],

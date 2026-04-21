@@ -21,7 +21,7 @@ export class WishlistService {
   ) {}
 
   async getCustomerWishlist(customerId: string) {
-    const list = await this.wishlistModel.find({ customerId }).sort({ createdAt: -1 }).lean();
+    const list = await this.wishlistModel.find({ customerId, status: { $ne: 'FULFILLED' } }).sort({ createdAt: -1 }).lean();
     return Promise.all(list.map(async item => {
       const product = await this.productModel.findById(item.productId).lean();
       const shop = await this.prisma.shop.findUnique({ where: { id: item.shopId }, select: { shopName: true } });
@@ -33,8 +33,8 @@ export class WishlistService {
     const product = await this.productModel.findById(productId);
     if (!product) throw new NotFoundException('Product not found');
 
-    const existing = await this.wishlistModel.findOne({ customerId, productId });
-    if (existing) throw new BadRequestException('Already in wishlist');
+    const existing = await this.wishlistModel.findOne({ customerId, productId, status: 'PENDING' });
+    if (existing) throw new BadRequestException('Already in pending wishlist');
 
     return this.wishlistModel.create({
       customerId,

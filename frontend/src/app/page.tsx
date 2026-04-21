@@ -64,7 +64,7 @@ export default function CustomerHomePage() {
           setUserLat(latitude); setUserLng(longitude);
           setLocationStatus('granted');
           fetchShops(latitude, longitude, radius);
-          api.patch('/customer/location', { lat: latitude, lng: longitude }).catch(() => {});
+          api.patch('/customer/location', { lat: latitude, lng: longitude }).catch(() => { });
         },
         () => {
           setLocationStatus('denied');
@@ -80,7 +80,7 @@ export default function CustomerHomePage() {
     setLocationStatus('granted');
     setShowMapPicker(false);
     fetchShops(pickerLat, pickerLng, radius);
-    api.patch('/customer/location', { lat: pickerLat, lng: pickerLng }).catch(() => {});
+    api.patch('/customer/location', { lat: pickerLat, lng: pickerLng }).catch(() => { });
   };
 
   useEffect(() => {
@@ -147,29 +147,27 @@ export default function CustomerHomePage() {
         {/* Left Sidebar */}
         <aside className="w-full lg:w-80 xl:w-96 flex-shrink-0 p-4 lg:p-6 lg:border-r border-slate-100 lg:h-[calc(100vh-64px)] lg:sticky lg:top-16 lg:overflow-y-auto">
           {/* Location Status */}
-          <div className={`mb-4 rounded-2xl p-4 flex items-center gap-3 ${
-            locationStatus === 'granted' ? 'bg-green-50 border border-green-100' :
-            locationStatus === 'denied' ? 'bg-amber-50 border border-amber-100' :
-            locationStatus === 'pending' ? 'bg-blue-50 border border-blue-100' :
-            'bg-slate-50 border border-slate-100'
-          }`}>
-            <span className={`material-symbols-outlined text-2xl ${
-              locationStatus === 'granted' ? 'text-green-500' :
-              locationStatus === 'denied' ? 'text-amber-500' :
-              'text-blue-400'
+          <div className={`mb-4 rounded-2xl p-4 flex items-center gap-3 ${locationStatus === 'granted' ? 'bg-green-50 border border-green-100' :
+              locationStatus === 'denied' ? 'bg-amber-50 border border-amber-100' :
+                locationStatus === 'pending' ? 'bg-blue-50 border border-blue-100' :
+                  'bg-slate-50 border border-slate-100'
             }`}>
+            <span className={`material-symbols-outlined text-2xl ${locationStatus === 'granted' ? 'text-green-500' :
+                locationStatus === 'denied' ? 'text-amber-500' :
+                  'text-blue-400'
+              }`}>
               {locationStatus === 'granted' ? 'location_on' : locationStatus === 'denied' ? 'location_off' : 'my_location'}
             </span>
             <div className="flex-1">
               <p className="text-xs font-bold text-on-surface">
                 {locationStatus === 'granted' ? 'Using your location' :
-                 locationStatus === 'denied' ? 'Location not shared' :
-                 locationStatus === 'pending' ? 'Getting your location...' : 'Location'}
+                  locationStatus === 'denied' ? 'Location not shared' :
+                    locationStatus === 'pending' ? 'Getting your location...' : 'Location'}
               </p>
               <p className="text-xs text-outline">
                 {locationStatus === 'granted' ? 'Shops sorted by distance' :
-                 locationStatus === 'denied' ? 'Showing all shops' :
-                 'Allow for better results'}
+                  locationStatus === 'denied' ? 'Showing all shops' :
+                    'Allow for better results'}
               </p>
             </div>
             <button

@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import TopNavBar from '@/components/TopNavBar';
 import BottomNavBar from '@/components/BottomNavBar';
 import api from '@/lib/api';
+import Link from 'next/link';
 
 interface Order {
   _id: string;
@@ -10,7 +11,8 @@ interface Order {
   shopId: string;
   status: string;
   createdAt: string;
-  product?: { productName: string; images: string[]; price: number };
+  markedAt?: string;
+  product?: { name: string; images: string[]; price: number };
   shop?: { shopName: string };
 }
 
@@ -30,7 +32,7 @@ export default function OrdersPage() {
     api.get('/customer/orders').then(r => setOrders(r.data)).catch(() => {}).finally(() => setLoading(false));
   }, []);
 
-  const BASE = 'http://localhost:3001/';
+  const BASE = 'http://localhost:3001/uploads/';
 
   return (
     <div className="min-h-screen bg-background pb-24 md:pb-10">
@@ -68,7 +70,7 @@ export default function OrdersPage() {
                 </div>
                 <div className="flex-1 p-4">
                   <div className="flex items-start justify-between">
-                    <h3 className="font-semibold text-on-surface text-sm">{order.product?.productName ?? 'Product'}</h3>
+                    <h3 className="font-semibold text-on-surface text-sm">{order.product?.name ?? 'Product'}</h3>
                     <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${statusColor[order.status] ?? 'bg-slate-50 text-slate-600'}`}>
                       {order.status}
                     </span>
@@ -82,7 +84,12 @@ export default function OrdersPage() {
                     {order.product?.price && (
                       <p className="text-sm font-bold text-primary">${order.product.price.toFixed(2)}</p>
                     )}
-                    <p className="text-xs text-outline">{new Date(order.createdAt).toLocaleDateString()}</p>
+                    <div className="flex items-center gap-3">
+                      <p className="text-xs text-outline">{new Date(order.createdAt || order.markedAt || Date.now()).toLocaleDateString()}</p>
+                      <Link href={`/products/${order.productId}`} className="px-3 py-1.5 bg-primary-container text-white text-xs font-bold rounded-lg hover:bg-primary transition-colors">
+                        Write Review
+                      </Link>
+                    </div>
                   </div>
                 </div>
               </div>

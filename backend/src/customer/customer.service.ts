@@ -7,6 +7,9 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { GeoService } from '../geo/geo.service';
 import { UploadService } from '../upload/upload.service';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { Product, ProductDocument } from '../product/schemas/product.schema';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateLocationDto } from './dto/update-location.dto';
 import * as bcrypt from 'bcrypt';
@@ -17,6 +20,8 @@ export class CustomerService {
     private prisma: PrismaService,
     private geo: GeoService,
     private upload: UploadService,
+    @InjectModel(Product.name)
+    private productModel: Model<ProductDocument>,
   ) {}
 
   async register(dto: CreateCustomerDto) {
@@ -178,10 +183,23 @@ export class CustomerService {
   }
 
   async getOrders(customerId: string) {
-    return this.prisma.orderHistory.findMany({
+    const orders = await this.prisma.orderHistory.findMany({
       where: { customerId },
       orderBy: { markedAt: 'desc' },
     });
+
+    return Promise.all(
+      orders.map(async (order) => {
+        const product = await this.productModel.findById(order.productId).lean();
+        const shop = await this.prisma.shop.findUnique({ where: { id: order.shopId }, select: { shopName: true } });
+        return {
+          ...order,
+          status: 'DELIVERED', // Since it's fulfilled wishlist
+          product,
+          shop,
+        };
+      }),
+    );
   }
 
   async deactivateAccount(customerId: string) {
