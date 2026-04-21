@@ -29,7 +29,7 @@ export class ReviewService {
     const purchased = await this.wishlistModel.findOne({
       customerId,
       productId,
-      status: 'DONE',
+      status: 'FULFILLED',
     });
 
     if (!purchased) {

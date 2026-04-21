@@ -40,6 +40,11 @@ export default function ProductDetailPage() {
   const [activeTab, setActiveTab] = useState<'desc' | 'reviews'>('desc');
   const [wishlistLoading, setWishlistLoading] = useState(false);
   const [wishlistDone, setWishlistDone] = useState(false);
+  
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewComment, setReviewComment] = useState('');
+  const [reviewLoading, setReviewLoading] = useState(false);
+  const [reviewError, setReviewError] = useState('');
 
   useEffect(() => {
     api.get(`/shop/public/product/${id}`).then(r => {
@@ -55,6 +60,22 @@ export default function ProductDetailPage() {
       setWishlistDone(true);
     } catch {}
     setWishlistLoading(false);
+  };
+
+  const submitReview = async () => {
+    if (!reviewComment.trim()) return;
+    setReviewLoading(true);
+    setReviewError('');
+    try {
+      await api.post(`/customer/review/${id}`, { rating: reviewRating, comment: reviewComment });
+      setReviewComment('');
+      setReviewRating(5);
+      const r = await api.get(`/products/${id}/reviews`);
+      setReviews(r.data);
+    } catch (err: any) {
+      setReviewError(err.response?.data?.message || 'Failed to submit review');
+    }
+    setReviewLoading(false);
   };
 
   if (!product) {
@@ -196,32 +217,62 @@ export default function ProductDetailPage() {
           )}
 
           {activeTab === 'reviews' && (
-            <div className="py-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-              {reviews.length === 0 && (
-                <div className="col-span-2 text-center py-12 text-on-surface-variant">
-                  <span className="material-symbols-outlined text-4xl block mb-2">rate_review</span>
-                  <p>No reviews yet</p>
-                </div>
-              )}
-              {reviews.map(r => (
-                <div key={r._id} className="p-6 bg-white rounded-2xl shadow-sm border border-slate-100">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center">
-                      <span className="material-symbols-outlined text-outline">person</span>
-                    </div>
-                    <div>
-                      <p className="text-sm font-bold">Customer</p>
-                      <p className="text-xs text-outline">{new Date(r.createdAt).toLocaleDateString()}</p>
-                    </div>
-                    <div className="ml-auto flex text-secondary">
-                      {Array.from({ length: 5 }).map((_, i) => (
-                        <span key={i} className={`material-symbols-outlined text-sm ${i < r.rating ? 'fill-icon' : ''}`}>star</span>
-                      ))}
-                    </div>
+            <div className="py-8">
+              <div className="mb-10 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                <h3 className="text-lg font-bold text-on-surface mb-4">Write a Review</h3>
+                {reviewError && <p className="text-error text-sm mb-3 bg-error-container/20 p-3 rounded-xl">{reviewError}</p>}
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="text-sm font-semibold">Rating:</span>
+                  <div className="flex gap-1">
+                    {[1, 2, 3, 4, 5].map(star => (
+                      <button key={star} onClick={() => setReviewRating(star)} className="text-secondary hover:scale-110 transition-transform">
+                        <span className={`material-symbols-outlined text-2xl ${star <= reviewRating ? 'fill-icon' : ''}`}>star</span>
+                      </button>
+                    ))}
                   </div>
-                  <p className="text-on-surface-variant text-sm">{r.comment}</p>
                 </div>
-              ))}
+                <textarea
+                  value={reviewComment}
+                  onChange={e => setReviewComment(e.target.value)}
+                  placeholder="Share your thoughts about this product..."
+                  className="w-full h-24 p-4 border border-outline-variant rounded-xl resize-none outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm mb-4"
+                />
+                <button
+                  onClick={submitReview}
+                  disabled={reviewLoading || !reviewComment.trim()}
+                  className="px-6 py-3 bg-primary text-white font-bold text-sm rounded-xl hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  {reviewLoading ? 'Submitting...' : 'Submit Review'}
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {reviews.length === 0 && (
+                  <div className="col-span-2 text-center py-12 text-on-surface-variant">
+                    <span className="material-symbols-outlined text-4xl block mb-2">rate_review</span>
+                    <p>No reviews yet</p>
+                  </div>
+                )}
+                {reviews.map(r => (
+                  <div key={r._id} className="p-6 bg-white rounded-2xl shadow-sm border border-slate-100">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center">
+                        <span className="material-symbols-outlined text-outline">person</span>
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold">Customer</p>
+                        <p className="text-xs text-outline">{new Date(r.createdAt).toLocaleDateString()}</p>
+                      </div>
+                      <div className="ml-auto flex text-secondary">
+                        {Array.from({ length: 5 }).map((_, i) => (
+                          <span key={i} className={`material-symbols-outlined text-sm ${i < r.rating ? 'fill-icon' : ''}`}>star</span>
+                        ))}
+                      </div>
+                    </div>
+                    <p className="text-on-surface-variant text-sm">{r.comment}</p>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </div>

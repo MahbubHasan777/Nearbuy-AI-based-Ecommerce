@@ -69,7 +69,7 @@ export class WishlistService {
       throw new BadRequestException('Item is not in PENDING state');
     }
 
-    item.status = 'DONE';
+    item.status = 'FULFILLED';
     await item.save();
 
     const product = await this.productModel.findById(item.productId);

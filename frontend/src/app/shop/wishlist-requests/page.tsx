@@ -32,11 +32,15 @@ export default function WishlistRequestsPage() {
   }, []);
 
   const updateStatus = async (id: string, status: string) => {
-    await api.patch(`/wishlist/${id}/status`, { status });
+    if (status === 'FULFILLED') {
+      await api.patch(`/shop/wishlist-requests/${id}/done`);
+    } else if (status === 'REJECTED') {
+      await api.patch(`/shop/wishlist-requests/${id}/reject`);
+    }
     setRequests(prev => prev.map(r => r._id === id ? { ...r, status } : r));
   };
 
-  const BASE = 'http://localhost:3001/';
+  const BASE = 'http://localhost:3001/uploads/';
   const filtered = filter === 'ALL' ? requests : requests.filter(r => r.status === filter);
   const pending = requests.filter(r => r.status === 'PENDING').length;
   const fulfilled = requests.filter(r => r.status === 'FULFILLED').length;
