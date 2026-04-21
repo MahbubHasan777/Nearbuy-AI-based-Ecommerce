@@ -12,6 +12,7 @@ import {
   UseInterceptors,
   UploadedFile,
   HttpCode,
+  NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -41,6 +42,14 @@ export class ShopController {
   @Get('public/:id/products')
   async getPublicProducts(@Param('id') id: string, @Query('sort') sort?: string) {
     return this.productModel.find({ shopId: id, status: 'IN_STOCK' }).sort({ createdAt: -1 });
+  }
+
+  @Get('public/product/:id')
+  async getPublicProduct(@Param('id') id: string) {
+    const product = await this.productModel.findById(id).lean();
+    if (!product) throw new NotFoundException('Product not found');
+    const shop = await this.shopService.getPublicProfile(product.shopId);
+    return { ...product, shop };
   }
 
   @Post('register')

@@ -7,16 +7,16 @@ import api from '@/lib/api';
 import Link from 'next/link';
 
 interface Product {
-  id: string;
-  productName: string;
+  _id: string;
+  name: string;
   price: number;
   discountPrice?: number;
   discountPercentage?: number;
   description?: string;
   images: string[];
   averageRating: number;
-  totalReviews: number;
-  keywords: string[];
+  totalRatings: number;
+  imageKeywords: string[];
   status: string;
   category?: { categoryName: string };
   brand?: { brandName: string };
@@ -42,10 +42,10 @@ export default function ProductDetailPage() {
   const [wishlistDone, setWishlistDone] = useState(false);
 
   useEffect(() => {
-    api.get(`/products/${id}`).then(r => {
+    api.get(`/shop/public/product/${id}`).then(r => {
       setProduct(r.data);
     }).catch(() => router.push('/search'));
-    api.get(`/reviews/${id}`).then(r => setReviews(r.data)).catch(() => {});
+    api.get(`/products/${id}/reviews`).then(r => setReviews(r.data)).catch(() => {});
   }, [id]);
 
   const addToWishlist = async () => {
@@ -77,7 +77,7 @@ export default function ProductDetailPage() {
             <div className="grid grid-cols-4 grid-rows-2 gap-4 h-[500px]">
               <div className="col-span-4 md:col-span-3 md:row-span-2 rounded-2xl overflow-hidden shadow-card bg-white relative">
                 {product.images[mainImg] ? (
-                  <img src={`${BASE}${product.images[mainImg]}`} alt={product.productName} className="w-full h-full object-cover" />
+                  <img src={`${BASE}${product.images[mainImg]}`} alt={product.name} className="w-full h-full object-cover" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center bg-surface-container">
                     <span className="material-symbols-outlined text-6xl text-outline">image</span>
@@ -110,14 +110,14 @@ export default function ProductDetailPage() {
                 {product.category && <><span>{product.category.categoryName}</span><span className="material-symbols-outlined text-xs">chevron_right</span></>}
                 {product.brand && <span className="text-on-surface">{product.brand.brandName}</span>}
               </nav>
-              <h1 className="text-3xl font-bold text-on-surface leading-tight mb-2">{product.productName}</h1>
+              <h1 className="text-3xl font-bold text-on-surface leading-tight mb-2">{product.name}</h1>
               <div className="flex items-center gap-4 mb-4">
                 <div className="flex items-center text-secondary">
                   {Array.from({ length: 5 }).map((_, i) => (
                     <span key={i} className={`material-symbols-outlined text-lg ${i < Math.round(product.averageRating) ? 'fill-icon' : ''}`}>star</span>
                   ))}
                   <span className="text-sm font-semibold ml-1">{product.averageRating.toFixed(1)}</span>
-                  <span className="text-outline text-xs ml-1">({product.totalReviews})</span>
+                  <span className="text-outline text-xs ml-1">({product.totalRatings})</span>
                 </div>
                 <span className="text-on-surface-variant text-xs bg-surface-container px-2 py-1 rounded font-semibold">{product.status}</span>
               </div>
@@ -130,14 +130,14 @@ export default function ProductDetailPage() {
               </div>
             </div>
 
-            {product.keywords && product.keywords.length > 0 && (
+            {product.imageKeywords && product.imageKeywords.length > 0 && (
               <div>
                 <p className="text-sm font-semibold text-on-surface flex items-center gap-2 mb-2">
                   <span className="material-symbols-outlined text-primary">auto_awesome</span>
                   Smart Highlights
                 </p>
                 <div className="flex flex-wrap gap-2">
-                  {product.keywords.map((kw, i) => (
+                  {product.imageKeywords.map((kw, i) => (
                     <span key={i} className="px-3 py-1.5 bg-blue-50 text-primary border border-blue-100 rounded-full text-xs font-semibold">{kw}</span>
                   ))}
                 </div>
@@ -185,7 +185,7 @@ export default function ProductDetailPage() {
               Description
             </button>
             <button onClick={() => setActiveTab('reviews')} className={`px-8 py-4 font-semibold text-sm ${activeTab === 'reviews' ? 'text-primary border-b-2 border-primary' : 'text-outline hover:text-on-surface'}`}>
-              Reviews ({product.totalReviews})
+              Reviews ({product.totalRatings})
             </button>
           </div>
 
