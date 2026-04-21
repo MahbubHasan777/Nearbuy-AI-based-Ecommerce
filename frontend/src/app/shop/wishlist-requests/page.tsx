@@ -11,7 +11,8 @@ interface WishlistRequest {
   productId: string;
   status: string;
   createdAt: string;
-  product?: { productName: string; images: string[]; price: number; category?: { categoryName: string } };
+  product?: { name: string; images: string[]; price: number; category?: { categoryName: string } };
+  customer?: { fullName: string; username: string };
 }
 
 const sideNav = [
@@ -135,7 +136,7 @@ export default function WishlistRequestsPage() {
                           <div className="w-9 h-9 rounded-full bg-surface-container flex items-center justify-center">
                             <span className="material-symbols-outlined text-sm text-outline">person</span>
                           </div>
-                          <p className="text-sm font-semibold text-on-surface">Customer</p>
+                          <p className="text-sm font-semibold text-on-surface">{item.customer?.fullName ?? item.customer?.username ?? 'Customer'}</p>
                         </div>
                       </td>
                       <td className="px-6 py-4">
@@ -150,7 +151,7 @@ export default function WishlistRequestsPage() {
                             )}
                           </div>
                           <div>
-                            <p className="text-sm font-semibold text-on-surface">{item.product?.productName ?? 'Product'}</p>
+                            <p className="text-sm font-semibold text-on-surface">{item.product?.name ?? 'Product'}</p>
                             {item.product?.category && <p className="text-xs text-outline">{item.product.category.categoryName}</p>}
                           </div>
                         </div>

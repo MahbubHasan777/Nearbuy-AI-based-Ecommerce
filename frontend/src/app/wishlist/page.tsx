@@ -9,9 +9,8 @@ interface WishlistItem {
   _id: string;
   productId: string;
   shopId: string;
-  status: string;
   createdAt: string;
-  product?: { productName: string; images: string[]; price: number };
+  product?: { name: string; images: string[]; price: number };
   shop?: { shopName: string };
 }
 
@@ -20,15 +19,15 @@ export default function WishlistPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.get('/wishlist').then(r => setItems(r.data)).catch(() => {}).finally(() => setLoading(false));
+    api.get('/customer/wishlist').then(r => setItems(r.data)).catch(() => {}).finally(() => setLoading(false));
   }, []);
 
   const remove = async (id: string) => {
-    await api.delete(`/wishlist/${id}`);
+    await api.delete(`/customer/wishlist/${id}`);
     setItems(prev => prev.filter(i => i._id !== id));
   };
 
-  const BASE = 'http://localhost:3001/';
+  const BASE = 'http://localhost:3001/uploads/';
 
   const statusColors: Record<string, string> = {
     PENDING: 'bg-blue-50 text-blue-700',
@@ -78,7 +77,7 @@ export default function WishlistPage() {
               <div className="flex-1 p-4 flex flex-col justify-between">
                 <div>
                   <div className="flex items-start justify-between">
-                    <h3 className="font-semibold text-on-surface text-base">{item.product?.productName ?? 'Product'}</h3>
+                    <h3 className="font-semibold text-on-surface text-base">{item.product?.name ?? 'Product'}</h3>
                     <button onClick={() => remove(item._id)} className="text-outline hover:text-error transition-colors p-1">
                       <span className="material-symbols-outlined text-xl">close</span>
                     </button>

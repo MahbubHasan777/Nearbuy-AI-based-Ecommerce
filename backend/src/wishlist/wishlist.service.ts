@@ -21,7 +21,12 @@ export class WishlistService {
   ) {}
 
   async getCustomerWishlist(customerId: string) {
-    return this.wishlistModel.find({ customerId }).sort({ createdAt: -1 });
+    const list = await this.wishlistModel.find({ customerId }).sort({ createdAt: -1 }).lean();
+    return Promise.all(list.map(async item => {
+      const product = await this.productModel.findById(item.productId).lean();
+      const shop = await this.prisma.shop.findUnique({ where: { id: item.shopId }, select: { shopName: true } });
+      return { ...item, product, shop };
+    }));
   }
 
   async addToWishlist(customerId: string, productId: string) {
@@ -48,7 +53,12 @@ export class WishlistService {
   }
 
   async getShopWishlistRequests(shopId: string) {
-    return this.wishlistModel.find({ shopId }).sort({ createdAt: -1 });
+    const list = await this.wishlistModel.find({ shopId }).sort({ createdAt: -1 }).lean();
+    return Promise.all(list.map(async item => {
+      const product = await this.productModel.findById(item.productId).lean();
+      const customer = await this.prisma.customer.findUnique({ where: { id: item.customerId }, select: { fullName: true, username: true } });
+      return { ...item, product, customer };
+    }));
   }
 
   async markAsDone(shopId: string, wishlistId: string) {
