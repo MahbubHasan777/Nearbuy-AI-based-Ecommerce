@@ -26,18 +26,20 @@ export class ReviewService {
     rating: number,
     comment: string,
   ) {
-    const purchased = await this.wishlistModel.findOne({
+    const purchaseCount = await this.wishlistModel.countDocuments({
       customerId,
       productId,
       status: { $in: ['FULFILLED', 'DONE'] },
     });
 
-    if (!purchased) {
+    if (purchaseCount === 0) {
       throw new BadRequestException('You can only review products you have purchased');
     }
 
-    const existing = await this.reviewModel.findOne({ customerId, productId });
-    if (existing) throw new BadRequestException('Already reviewed this product');
+    const reviewCount = await this.reviewModel.countDocuments({ customerId, productId });
+    if (reviewCount >= purchaseCount) {
+      throw new BadRequestException('You have already reviewed all your purchases for this product');
+    }
 
     const product = await this.productModel.findById(productId);
     if (!product) throw new NotFoundException('Product not found');

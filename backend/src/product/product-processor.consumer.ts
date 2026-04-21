@@ -24,6 +24,28 @@ export class ProductProcessor extends WorkerHost {
       await this.productModel.findByIdAndUpdate(productId, {
         imageKeywords: keywords,
       });
+
+      const updatedProduct = await this.productModel.findById(productId);
+      if (updatedProduct) {
+        const textToEmbed = [
+          updatedProduct.name,
+          updatedProduct.description || '',
+          ...(updatedProduct.imageKeywords as string[] || []),
+        ].join('. ');
+
+        try {
+          await fetch('http://localhost:8000/upsert', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              product_id: productId.toString(),
+              text: textToEmbed,
+            }),
+          });
+        } catch (err) {
+          console.error('Failed to index product in ChromaDB:', err);
+        }
+      }
     } catch {
       // silently fail — keywords not critical for product creation
     }
