@@ -40,6 +40,12 @@ export default function WishlistRequestsPage() {
     setRequests(prev => prev.map(r => r._id === id ? { ...r, status } : r));
   };
 
+  const removeRequest = async (id: string) => {
+    if (!confirm('Are you sure you want to remove this request from your view?')) return;
+    await api.delete(`/shop/wishlist-requests/${id}`);
+    setRequests(prev => prev.filter(r => r._id !== id));
+  };
+
   const BASE = 'http://localhost:3001/uploads/';
   const filtered = filter === 'ALL' ? requests : requests.filter(r => r.status === filter);
   const pending = requests.filter(r => r.status === 'PENDING').length;
@@ -179,8 +185,8 @@ export default function WishlistRequestsPage() {
                             </button>
                           </div>
                         ) : (
-                          <button className="p-2 text-outline hover:text-on-surface transition-colors">
-                            <span className="material-symbols-outlined">more_vert</span>
+                          <button onClick={() => removeRequest(item._id)} className="p-2 text-outline hover:bg-error-container/20 hover:text-error rounded-lg transition-colors" title="Remove from dashboard">
+                            <span className="material-symbols-outlined">delete</span>
                           </button>
                         )}
                       </td>

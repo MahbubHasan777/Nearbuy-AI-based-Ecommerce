@@ -14,7 +14,7 @@ export class Wishlist {
   @Prop({ required: true })
   shopId: string;
 
-  @Prop({ enum: ['PENDING', 'REJECTED', 'DONE'], default: 'PENDING' })
+  @Prop({ enum: ['PENDING', 'REJECTED', 'DONE', 'FULFILLED'], default: 'PENDING' })
   status: string;
 }
 

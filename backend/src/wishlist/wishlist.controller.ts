@@ -53,4 +53,10 @@ export class WishlistController {
   reject(@Req() req: any, @Param('id') id: string) {
     return this.wishlistService.reject(req.user.id, id);
   }
+
+  @Delete('shop/wishlist-requests/:id')
+  @Roles('SHOP')
+  removeShopRequest(@Req() req: any, @Param('id') id: string) {
+    return this.wishlistService.removeShopRequest(req.user.id, id);
+  }
 }

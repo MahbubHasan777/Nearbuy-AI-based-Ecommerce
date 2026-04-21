@@ -101,4 +101,13 @@ export class WishlistService {
     await item.save();
     return { message: 'Wishlist request rejected' };
   }
+
+  async removeShopRequest(shopId: string, wishlistId: string) {
+    const item = await this.wishlistModel.findById(wishlistId);
+    if (!item) throw new NotFoundException('Wishlist item not found');
+    if (item.shopId !== shopId) throw new ForbiddenException();
+
+    await item.deleteOne();
+    return { message: 'Removed from dashboard' };
+  }
 }
