@@ -51,7 +51,7 @@ export default function ProductDetailPage() {
   const addToWishlist = async () => {
     setWishlistLoading(true);
     try {
-      await api.post('/wishlist', { productId: id });
+      await api.post(`/customer/wishlist/${id}`);
       setWishlistDone(true);
     } catch {}
     setWishlistLoading(false);
@@ -65,7 +65,7 @@ export default function ProductDetailPage() {
     );
   }
 
-  const BASE = 'http://localhost:3001/';
+  const BASE = 'http://localhost:3001/uploads/';
 
   return (
     <div className="min-h-screen bg-background pb-24 md:pb-0">

@@ -141,7 +141,7 @@ function SearchContent() {
                     <div className="relative aspect-square overflow-hidden bg-surface-container">
                       {item.images[0] ? (
                         <img
-                          src={`http://localhost:3001/${item.images[0]}`}
+                          src={`http://localhost:3001/uploads/${item.images[0]}`}
                           alt={item.productName}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         />
@@ -154,7 +154,15 @@ function SearchContent() {
                         <span className="material-symbols-outlined text-secondary text-sm fill-icon">bolt</span>
                         <span className="text-xs font-medium text-on-surface">{100 - i * 5}% Match</span>
                       </div>
-                      <button className="absolute top-3 right-3 h-8 w-8 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center text-outline hover:text-error transition-colors">
+                      <button 
+                        onClick={e => {
+                          e.preventDefault();
+                          api.post(`/customer/wishlist/${item.productId}`)
+                             .then(() => alert('Added to Wishlist!'))
+                             .catch(() => alert('Failed to add. Please log in first.'));
+                        }}
+                        className="absolute top-3 right-3 h-8 w-8 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center text-outline hover:text-error transition-colors"
+                      >
                         <span className="material-symbols-outlined text-[20px]">favorite</span>
                       </button>
                     </div>
