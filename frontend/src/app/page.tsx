@@ -331,7 +331,7 @@ export default function CustomerHomePage() {
       {/* Map Location Picker Modal */}
       {showMapPicker && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden">
+          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-4xl overflow-hidden flex flex-col max-h-[90vh]">
             <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
               <div>
                 <h3 className="font-bold text-on-surface text-lg">Pick Your Location</h3>
@@ -341,7 +341,7 @@ export default function CustomerHomePage() {
                 <span className="material-symbols-outlined text-on-surface-variant">close</span>
               </button>
             </div>
-            <div className="h-72 w-full relative">
+            <div className="h-[60vh] w-full relative">
               <LocationPicker
                 lat={pickerLat}
                 lng={pickerLng}

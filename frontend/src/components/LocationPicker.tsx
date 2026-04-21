@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface Props {
   lat: number;
@@ -11,6 +11,33 @@ export default function LocationPicker({ lat, lng, onChange }: Props) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
   const markerRef = useRef<any>(null);
+
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+
+  const searchLocation = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!searchQuery.trim()) return;
+    setIsSearching(true);
+    try {
+      const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}`);
+      const data = await res.json();
+      setSearchResults(data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const selectResult = (result: any) => {
+    const newLat = parseFloat(result.lat);
+    const newLng = parseFloat(result.lon);
+    onChange(newLat, newLng);
+    setSearchResults([]);
+    setSearchQuery('');
+  };
 
   useEffect(() => {
     if (typeof window === 'undefined' || !mapRef.current) return;
@@ -66,7 +93,44 @@ export default function LocationPicker({ lat, lng, onChange }: Props) {
         rel="stylesheet"
         href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
       />
-      <div ref={mapRef} className="w-full h-full rounded-xl overflow-hidden z-0" />
+      <div className="relative w-full h-full">
+        <div ref={mapRef} className="w-full h-full rounded-xl overflow-hidden z-0" />
+        
+        {/* Search Overlay */}
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 w-11/12 max-w-md z-[1000]">
+          <form onSubmit={searchLocation} className="flex bg-white rounded-xl shadow-lg overflow-hidden border border-slate-200">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              placeholder="Search for a location..."
+              className="flex-1 px-4 py-3 text-sm outline-none"
+            />
+            <button type="submit" disabled={isSearching} className="px-4 bg-primary text-white font-bold flex items-center justify-center disabled:opacity-70">
+              {isSearching ? (
+                <span className="material-symbols-outlined animate-spin">refresh</span>
+              ) : (
+                <span className="material-symbols-outlined">search</span>
+              )}
+            </button>
+          </form>
+
+          {searchResults.length > 0 && (
+            <div className="mt-2 bg-white rounded-xl shadow-xl border border-slate-200 max-h-60 overflow-y-auto">
+              {searchResults.map((result, idx) => (
+                <div
+                  key={idx}
+                  onClick={() => selectResult(result)}
+                  className="px-4 py-3 border-b last:border-b-0 border-slate-100 hover:bg-slate-50 cursor-pointer text-sm"
+                >
+                  <p className="font-semibold text-on-surface line-clamp-1">{result.display_name.split(',')[0]}</p>
+                  <p className="text-xs text-outline line-clamp-1">{result.display_name}</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
     </>
   );
 }
