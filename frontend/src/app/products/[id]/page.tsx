@@ -151,20 +151,6 @@ export default function ProductDetailPage() {
               </div>
             </div>
 
-            {product.imageKeywords && product.imageKeywords.length > 0 && (
-              <div>
-                <p className="text-sm font-semibold text-on-surface flex items-center gap-2 mb-2">
-                  <span className="material-symbols-outlined text-primary">auto_awesome</span>
-                  Smart Highlights
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {product.imageKeywords.map((kw, i) => (
-                    <span key={i} className="px-3 py-1.5 bg-blue-50 text-primary border border-blue-100 rounded-full text-xs font-semibold">{kw}</span>
-                  ))}
-                </div>
-              </div>
-            )}
-
             <div className="flex gap-3 pt-2">
               <button
                 onClick={addToWishlist}
