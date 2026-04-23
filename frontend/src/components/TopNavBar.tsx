@@ -64,14 +64,14 @@ export default function TopNavBar({ onSearch, searchValue = '', variant = 'custo
           </button>
           {user ? (
             <div className="flex items-center gap-2">
-              <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-surface-container-low rounded-full">
+              <Link href={user.role === 'SHOP' ? '/shop/profile' : user.role === 'ADMIN' ? '/admin/profile' : '/profile'} className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-surface-container-low rounded-full hover:bg-surface-container transition-colors cursor-pointer">
                 <div className="w-6 h-6 rounded-full bg-primary-container flex items-center justify-center text-white font-bold text-[10px]">
                   {user.name?.charAt(0).toUpperCase() || user.email.charAt(0).toUpperCase()}
                 </div>
                 <span className="text-xs font-semibold text-on-surface truncate max-w-[100px]">
                   {user.name || user.email.split('@')[0]}
                 </span>
-              </div>
+              </Link>
               <button
                 onClick={() => logout()}
                 className="flex items-center gap-1.5 px-3 py-2 bg-error-container text-on-error-container rounded-full text-xs font-bold hover:opacity-90 active:scale-95 transition-all"

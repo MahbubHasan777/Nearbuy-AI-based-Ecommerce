@@ -150,10 +150,7 @@ function SearchContent() {
                           <span className="material-symbols-outlined text-5xl text-outline">image</span>
                         </div>
                       )}
-                      <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1 flex items-center gap-1.5 shadow-sm">
-                        <span className="material-symbols-outlined text-secondary text-sm fill-icon">bolt</span>
-                        <span className="text-xs font-medium text-on-surface">{100 - i * 5}% Match</span>
-                      </div>
+
                       <button 
                         onClick={e => {
                           e.preventDefault();
