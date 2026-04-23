@@ -298,8 +298,17 @@ export default function CustomerHomePage() {
                     </div>
                     {/* Info */}
                     <div className="p-4">
-                      <h3 className="font-bold text-on-surface group-hover:text-primary transition-colors truncate">{shop.shopName}</h3>
-                      <p className="text-outline text-xs mt-1 flex items-center gap-1 truncate">
+                      <div className="flex justify-between items-start mb-1">
+                        <h3 className="font-bold text-on-surface group-hover:text-primary transition-colors truncate pr-2">{shop.shopName}</h3>
+                        {(shop as any).totalRatings > 0 && (
+                          <div className="flex items-center gap-1 bg-amber-50 px-1.5 py-0.5 rounded text-amber-700 flex-shrink-0">
+                            <span className="material-symbols-outlined text-[14px]">star</span>
+                            <span className="text-xs font-bold">{(shop as any).averageRating?.toFixed(1)}</span>
+                            <span className="text-[10px] opacity-75">({(shop as any).totalRatings})</span>
+                          </div>
+                        )}
+                      </div>
+                      <p className="text-outline text-xs flex items-center gap-1 truncate">
                         <span className="material-symbols-outlined text-sm">location_on</span>
                         {shop.shopAddress || 'Address not set'}
                       </p>

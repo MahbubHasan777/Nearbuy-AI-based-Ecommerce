@@ -131,9 +131,43 @@ export class CustomerService {
       },
     });
 
-    if (!lat || !lng) return shops;
+    if (!lat || !lng) {
+      return this.attachShopRatings(shops);
+    }
 
-    return this.geo.filterByRadius(shops, lat, lng, radius);
+    const filtered = this.geo.filterByRadius(shops, lat, lng, radius);
+    return this.attachShopRatings(filtered);
+  }
+
+  private async attachShopRatings(shops: any[]) {
+    if (shops.length === 0) return shops;
+
+    const shopIds = shops.map(s => s.id || s._id);
+    
+    // Aggregate ratings from products for these shops
+    const aggregations = await this.productModel.aggregate([
+      { $match: { shopId: { $in: shopIds } } },
+      { $group: {
+          _id: '$shopId',
+          totalRatings: { $sum: '$totalRatings' },
+          averageRating: { $avg: '$averageRating' }
+        }
+      }
+    ]);
+
+    const ratingMap = new Map(aggregations.map(a => [
+      a._id, 
+      { totalRatings: a.totalRatings, averageRating: Math.round(a.averageRating * 10) / 10 }
+    ]));
+
+    return shops.map(shop => {
+      const stats = ratingMap.get(shop.id || shop._id) || { totalRatings: 0, averageRating: 0 };
+      return {
+        ...shop,
+        averageRating: stats.averageRating,
+        totalRatings: stats.totalRatings,
+      };
+    });
   }
 
   async getFavourites(customerId: string) {

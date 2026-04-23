@@ -3,6 +3,7 @@ import { useEffect, useState, useRef } from 'react';
 import TopNavBar from '@/components/TopNavBar';
 import BottomNavBar from '@/components/BottomNavBar';
 import ShopSidebar from '@/components/ShopSidebar';
+import LocationPicker from '@/components/LocationPicker';
 import api from '@/lib/api';
 
 export default function ShopProfilePage() {
@@ -155,27 +156,25 @@ export default function ShopProfilePage() {
                 ))}
 
                 <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-bold text-outline uppercase tracking-wider mb-1.5">Latitude</label>
-                    <input
-                      type="number"
-                      step="any"
-                      value={form.lat}
-                      onChange={e => setForm(f => ({ ...f, lat: e.target.value }))}
-                      className="w-full border border-outline-variant rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
-                      placeholder="23.8103"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold text-outline uppercase tracking-wider mb-1.5">Longitude</label>
-                    <input
-                      type="number"
-                      step="any"
-                      value={form.lng}
-                      onChange={e => setForm(f => ({ ...f, lng: e.target.value }))}
-                      className="w-full border border-outline-variant rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all"
-                      placeholder="90.4125"
-                    />
+                  <div className="col-span-2 mt-4">
+                    <label className="block text-xs font-bold text-outline uppercase tracking-wider mb-3">Pinpoint Location on Map</label>
+                    <div className="h-[400px] rounded-xl overflow-hidden border border-outline-variant">
+                      <LocationPicker 
+                        lat={parseFloat(form.lat) || 23.8103} 
+                        lng={parseFloat(form.lng) || 90.4125} 
+                        onChange={(lat, lng) => setForm(f => ({ ...f, lat: lat.toString(), lng: lng.toString() }))}
+                      />
+                    </div>
+                    <div className="flex gap-4 mt-2">
+                      <div className="flex-1 bg-slate-50 rounded-lg p-2 border border-slate-100">
+                        <span className="block text-[10px] text-outline uppercase font-bold">Lat</span>
+                        <span className="text-sm font-mono">{form.lat || 'Not set'}</span>
+                      </div>
+                      <div className="flex-1 bg-slate-50 rounded-lg p-2 border border-slate-100">
+                        <span className="block text-[10px] text-outline uppercase font-bold">Lng</span>
+                        <span className="text-sm font-mono">{form.lng || 'Not set'}</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
