@@ -58,24 +58,14 @@ export class SearchService {
 
     const q = query.toLowerCase().trim();
     const scored = products.map((p) => {
-      let score = 0;
+      let matchType = '';
       
-      // ChromaDB scoring
-      if (queryProductIds !== null) {
-        const index = queryProductIds.indexOf(p._id.toString());
-        if (index !== -1) {
-          // Add a high baseline score for semantic relevance, up to 100 points
-          score += 50 + ((queryProductIds.length - index) / queryProductIds.length) * 50; 
-        }
-      } 
-      
-      // Fuzzy string scoring
       if (q) {
         const name = p.name.toLowerCase();
         const keywords = ((p.imageKeywords as string[]) || []).map((k) => k.toLowerCase());
 
         if (name === q) {
-          score += 150; // Exact match heavily favored
+          matchType = 'exact';
         } else {
           const qTokens = q.split(' ');
           const nameTokens = name.split(' ');
@@ -83,67 +73,73 @@ export class SearchService {
           const prefixMatches = qTokens.filter((qt) =>
             nameTokens.some((nt) => nt.startsWith(qt)),
           ).length;
-          if (prefixMatches > 0) score += (prefixMatches / qTokens.length) * 75;
 
           const fuzzyScore = this.maxSimilarity(q, name);
-          if (fuzzyScore >= 0.6) score += fuzzyScore * 50;
 
-          const kwMatches = qTokens.filter((qt) =>
-            keywords.some((kw) => kw.includes(qt)),
-          ).length;
-          if (kwMatches === 1) score += 10;
-          else if (kwMatches === 2) score += 30;
-          else if (kwMatches >= 3) score += 50;
+          if (fuzzyScore >= 0.6 || prefixMatches > 0) {
+            matchType = 'fuzzy';
+          } else if (queryProductIds !== null && queryProductIds.includes(p._id.toString())) {
+            matchType = 'similar';
+          } else {
+            const kwMatches = qTokens.filter((qt) =>
+              keywords.some((kw) => kw.includes(qt)),
+            ).length;
+            if (kwMatches > 0) matchType = 'keyword';
+          }
         }
       } else {
-        score = 1; // no query
+        matchType = 'exact';
       }
 
-      if (score === 0) return null;
+      if (!matchType) return null;
 
       if (params['minPrice'] && p.price < Number(params['minPrice'])) return null;
       if (params['maxPrice'] && p.price > Number(params['maxPrice'])) return null;
       if (params['minRating'] && p.averageRating < Number(params['minRating'])) return null;
       if (params['maxRating'] && p.averageRating > Number(params['maxRating'])) return null;
 
-      return { product: p, score }; 
+      return { product: p, matchType }; 
     });
 
-    const filtered = scored.filter(Boolean) as { product: any; score: number }[];
-    if (q) filtered.sort((a, b) => b.score - a.score);
+    const filtered = scored.filter(Boolean) as { product: any; matchType: string }[];
+    
+    // Sort logic is now applied per category or flattened. We will group them!
+    const exactMatches = this.applySort(filtered.filter(f => f.matchType === 'exact').map(f => f.product), params['sort']);
+    const fuzzyMatches = this.applySort(filtered.filter(f => f.matchType === 'fuzzy').map(f => f.product), params['sort']);
+    const similarMatches = this.applySort(filtered.filter(f => f.matchType === 'similar').map(f => f.product), params['sort']);
+    const keywordMatches = this.applySort(filtered.filter(f => f.matchType === 'keyword').map(f => f.product), params['sort']);
 
-    const sorted = this.applySort(filtered.map((f) => f.product), params['sort']);
     const shopMap = new Map<string, any>(allShops.map((s) => [s.id, s]));
+
+    const formatProduct = (p: any) => {
+      const shop = shopMap.get(p.shopId);
+      const dist = customer?.lat && customer?.lng && shop ? this.geo.haversine(customer.lat, customer.lng, shop.lat, shop.lng) : null;
+      return {
+        productId: p._id,
+        productName: p.name,
+        price: p.price,
+        discountPrice: p.discountPrice,
+        discountPercentage: p.discountPercentage,
+        status: p.status,
+        images: p.images,
+        averageRating: p.averageRating,
+        totalRatings: p.totalRatings,
+        shop: shop ? {
+          shopId: shop.id,
+          shopName: shop.shopName,
+          distance_km: dist ? Math.round((dist / 1000) * 10) / 10 : null,
+        } : null,
+      };
+    };
 
     return {
       query,
       radius_km: radius / 1000,
-      total: sorted.length,
-      results: sorted.map((p) => {
-        const shop = shopMap.get(p.shopId);
-        const dist =
-          customer?.lat && customer?.lng && shop
-            ? this.geo.haversine(customer.lat, customer.lng, shop.lat, shop.lng)
-            : null;
-        return {
-          productId: p._id,
-          productName: p.name,
-          price: p.price,
-          discountPrice: p.discountPrice,
-          discountPercentage: p.discountPercentage,
-          status: p.status,
-          images: p.images,
-          averageRating: p.averageRating,
-          totalRatings: p.totalRatings,
-          shop: shop
-            ? {
-                shopId: shop.id,
-                shopName: shop.shopName,
-                distance_km: dist ? Math.round((dist / 1000) * 10) / 10 : null,
-              }
-            : null,
-        };
-      }),
+      total: exactMatches.length + fuzzyMatches.length + similarMatches.length + keywordMatches.length,
+      exact: exactMatches.map(formatProduct),
+      fuzzy: fuzzyMatches.map(formatProduct),
+      similar: similarMatches.map(formatProduct),
+      keyword: keywordMatches.map(formatProduct),
     };
   }
 
@@ -173,42 +169,60 @@ export class SearchService {
     const filter: any = { shopId };
     const products = await this.productModel.find(filter);
 
-    const scored = products
-      .map((p) => {
-        let score = 0;
-        
-        if (queryProductIds !== null) {
-          const index = queryProductIds.indexOf(p._id.toString());
-          if (index !== -1) {
-            score += 50 + ((queryProductIds.length - index) / queryProductIds.length) * 50;
-          }
-        } 
-        
-        if (q) {
-          const name = p.name.toLowerCase();
-          if (name === q) score += 150;
-          else {
-            const qTokens = q.split(' ');
-            const nameTokens = name.split(' ');
-            const prefixMatches = qTokens.filter((qt) =>
-              nameTokens.some((nt) => nt.startsWith(qt)),
-            ).length;
-            if (prefixMatches > 0) score += (prefixMatches / qTokens.length) * 75;
+    const q = query.toLowerCase().trim();
+    const scored = products.map((p) => {
+      let matchType = '';
+      
+      if (q) {
+        const name = p.name.toLowerCase();
+        const keywords = ((p.imageKeywords as string[]) || []).map((k) => k.toLowerCase());
 
-            const fuzzyScore = this.maxSimilarity(q, name);
-            if (fuzzyScore >= 0.6) score += fuzzyScore * 50;
-          }
+        if (name === q) {
+          matchType = 'exact';
         } else {
-          score = 1;
-        }
-        
-        if (score === 0) return null;
-        return { product: p, score };
-      })
-      .filter(Boolean) as { product: any; score: number }[];
+          const qTokens = q.split(' ');
+          const nameTokens = name.split(' ');
 
-    if (q) scored.sort((a, b) => b.score - a.score);
-    return { query, total: scored.length, results: scored.map((s) => s.product) };
+          const prefixMatches = qTokens.filter((qt) =>
+            nameTokens.some((nt) => nt.startsWith(qt)),
+          ).length;
+
+          const fuzzyScore = this.maxSimilarity(q, name);
+
+          if (fuzzyScore >= 0.6 || prefixMatches > 0) {
+            matchType = 'fuzzy';
+          } else if (queryProductIds !== null && queryProductIds.includes(p._id.toString())) {
+            matchType = 'similar';
+          } else {
+            const kwMatches = qTokens.filter((qt) =>
+              keywords.some((kw) => kw.includes(qt)),
+            ).length;
+            if (kwMatches > 0) matchType = 'keyword';
+          }
+        }
+      } else {
+        matchType = 'exact';
+      }
+
+      if (!matchType) return null;
+      return { product: p, matchType };
+    });
+
+    const filtered = scored.filter(Boolean) as { product: any; matchType: string }[];
+    
+    const exactMatches = this.applySort(filtered.filter(f => f.matchType === 'exact').map(f => f.product), params['sort'] || '');
+    const fuzzyMatches = this.applySort(filtered.filter(f => f.matchType === 'fuzzy').map(f => f.product), params['sort'] || '');
+    const similarMatches = this.applySort(filtered.filter(f => f.matchType === 'similar').map(f => f.product), params['sort'] || '');
+    const keywordMatches = this.applySort(filtered.filter(f => f.matchType === 'keyword').map(f => f.product), params['sort'] || '');
+
+    return { 
+      query, 
+      total: exactMatches.length + fuzzyMatches.length + similarMatches.length + keywordMatches.length, 
+      exact: exactMatches,
+      fuzzy: fuzzyMatches,
+      similar: similarMatches,
+      keyword: keywordMatches
+    };
   }
 
   private applySort(products: any[], sort: string) {

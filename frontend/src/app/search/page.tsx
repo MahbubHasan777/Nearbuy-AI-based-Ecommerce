@@ -22,7 +22,10 @@ interface SearchResponse {
   query: string;
   radius_km: number;
   total: number;
-  results: SearchResult[];
+  exact: SearchResult[];
+  fuzzy: SearchResult[];
+  similar: SearchResult[];
+  keyword: SearchResult[];
 }
 
 function SearchContent() {
@@ -56,6 +59,73 @@ function SearchContent() {
   const handleSearch = (newQ: string) => {
     router.push(`/search?q=${encodeURIComponent(newQ)}`);
   };
+
+  const renderProductCard = (item: SearchResult) => (
+    <Link key={item.productId} href={`/products/${item.productId}`}>
+      <div className="bg-white rounded-xl overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-300 group border border-slate-100 flex flex-col h-full cursor-pointer">
+        <div className="relative aspect-square overflow-hidden bg-surface-container">
+          {item.images[0] ? (
+            <img
+              src={`http://localhost:3001/uploads/${item.images[0]}`}
+              alt={item.productName}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center">
+              <span className="material-symbols-outlined text-5xl text-outline">image</span>
+            </div>
+          )}
+
+          <button 
+            onClick={e => {
+              e.preventDefault();
+              api.post(`/customer/wishlist/${item.productId}`)
+                 .then(() => alert('Added to Wishlist!'))
+                 .catch(() => alert('Failed to add. Please log in first.'));
+            }}
+            className="absolute top-3 right-3 h-8 w-8 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center text-outline hover:text-error transition-colors"
+          >
+            <span className="material-symbols-outlined text-[20px]">favorite</span>
+          </button>
+        </div>
+        <div className="p-5 flex-1 flex flex-col">
+          <div className="flex justify-between items-start mb-1">
+            <h3 className="font-semibold text-[17px] text-on-surface line-clamp-1">{item.productName}</h3>
+            <div className="text-right flex flex-col items-end">
+              <span className="text-primary font-semibold text-[17px]">
+                ৳{item.discountPrice ?? item.price}
+              </span>
+              {item.averageRating > 0 && (
+                <div className="flex items-center gap-0.5 text-amber-500 mt-1">
+                  <span className="material-symbols-outlined text-[14px] fill-icon">star</span>
+                  <span className="text-xs text-on-surface-variant font-bold">{item.averageRating.toFixed(1)}</span>
+                  <span className="text-[10px] text-outline ml-0.5">({item.totalRatings})</span>
+                </div>
+              )}
+            </div>
+          </div>
+          {item.shop && (
+            <div className="flex items-center gap-2 mb-4">
+              <span className="material-symbols-outlined text-outline text-[18px]">store</span>
+              <span className="text-xs text-outline font-medium">{item.shop.shopName}</span>
+            </div>
+          )}
+          <div className="mt-auto pt-4 border-t border-slate-50 flex items-center justify-between">
+            <div className="flex items-center gap-1.5 text-on-surface-variant">
+              <span className="material-symbols-outlined text-[18px] text-primary">location_on</span>
+              <span className="text-xs">{item.shop?.distance_km ?? '?'} km away</span>
+            </div>
+            <button
+              onClick={e => { e.preventDefault(); }}
+              className="bg-secondary text-white px-4 py-2 rounded-lg text-xs font-bold hover:opacity-90 active:scale-95 transition-all"
+            >
+              Add to List
+            </button>
+          </div>
+        </div>
+      </div>
+    </Link>
+  );
 
   return (
     <div className="min-h-screen bg-background">
@@ -125,7 +195,7 @@ function SearchContent() {
             </div>
           )}
 
-          {!loading && data && data.results.length === 0 && (
+          {!loading && data && data.total === 0 && (
             <div className="text-center py-20 text-on-surface-variant">
               <span className="material-symbols-outlined text-5xl block mb-3">search_off</span>
               <p className="font-semibold text-lg">No results found</p>
@@ -133,74 +203,67 @@ function SearchContent() {
             </div>
           )}
 
-          {!loading && data && data.results.length > 0 && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {data.results.map((item, i) => (
-                <Link key={item.productId} href={`/products/${item.productId}`}>
-                  <div className="bg-white rounded-xl overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-300 group border border-slate-100 flex flex-col h-full cursor-pointer">
-                    <div className="relative aspect-square overflow-hidden bg-surface-container">
-                      {item.images[0] ? (
-                        <img
-                          src={`http://localhost:3001/uploads/${item.images[0]}`}
-                          alt={item.productName}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center">
-                          <span className="material-symbols-outlined text-5xl text-outline">image</span>
-                        </div>
-                      )}
-
-                      <button 
-                        onClick={e => {
-                          e.preventDefault();
-                          api.post(`/customer/wishlist/${item.productId}`)
-                             .then(() => alert('Added to Wishlist!'))
-                             .catch(() => alert('Failed to add. Please log in first.'));
-                        }}
-                        className="absolute top-3 right-3 h-8 w-8 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center text-outline hover:text-error transition-colors"
-                      >
-                        <span className="material-symbols-outlined text-[20px]">favorite</span>
-                      </button>
-                    </div>
-                    <div className="p-5 flex-1 flex flex-col">
-                      <div className="flex justify-between items-start mb-1">
-                        <h3 className="font-semibold text-[17px] text-on-surface line-clamp-1">{item.productName}</h3>
-                        <div className="text-right flex flex-col items-end">
-                          <span className="text-primary font-semibold text-[17px]">
-                            ৳{item.discountPrice ?? item.price}
-                          </span>
-                          {item.averageRating > 0 && (
-                            <div className="flex items-center gap-0.5 text-amber-500 mt-1">
-                              <span className="material-symbols-outlined text-[14px] fill-icon">star</span>
-                              <span className="text-xs text-on-surface-variant font-bold">{item.averageRating.toFixed(1)}</span>
-                              <span className="text-[10px] text-outline ml-0.5">({item.totalRatings})</span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                      {item.shop && (
-                        <div className="flex items-center gap-2 mb-4">
-                          <span className="material-symbols-outlined text-outline text-[18px]">store</span>
-                          <span className="text-xs text-outline font-medium">{item.shop.shopName}</span>
-                        </div>
-                      )}
-                      <div className="mt-auto pt-4 border-t border-slate-50 flex items-center justify-between">
-                        <div className="flex items-center gap-1.5 text-on-surface-variant">
-                          <span className="material-symbols-outlined text-[18px] text-primary">location_on</span>
-                          <span className="text-xs">{item.shop?.distance_km ?? '?'} km away</span>
-                        </div>
-                        <button
-                          onClick={e => { e.preventDefault(); }}
-                          className="bg-secondary text-white px-4 py-2 rounded-lg text-xs font-bold hover:opacity-90 active:scale-95 transition-all"
-                        >
-                          Add to List
-                        </button>
-                      </div>
+          {!loading && data && data.total > 0 && (
+            <div className="space-y-12">
+              {data.exact && data.exact.length > 0 && (
+                <div>
+                  <div className="flex items-center gap-2 mb-6">
+                    <span className="material-symbols-outlined text-primary text-3xl">check_circle</span>
+                    <div>
+                      <h3 className="text-xl font-bold text-on-surface">Exact Matches</h3>
+                      <p className="text-xs text-outline">Products matching your search exactly</p>
                     </div>
                   </div>
-                </Link>
-              ))}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {data.exact.map(item => renderProductCard(item))}
+                  </div>
+                </div>
+              )}
+
+              {data.fuzzy && data.fuzzy.length > 0 && (
+                <div>
+                  <div className="flex items-center gap-2 mb-6">
+                    <span className="material-symbols-outlined text-amber-500 text-3xl">spellcheck</span>
+                    <div>
+                      <h3 className="text-xl font-bold text-on-surface">Did you mean?</h3>
+                      <p className="text-xs text-outline">Products with similar names or typo corrections</p>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {data.fuzzy.map(item => renderProductCard(item))}
+                  </div>
+                </div>
+              )}
+
+              {data.similar && data.similar.length > 0 && (
+                <div>
+                  <div className="flex items-center gap-2 mb-6">
+                    <span className="material-symbols-outlined text-purple-500 text-3xl">auto_awesome</span>
+                    <div>
+                      <h3 className="text-xl font-bold text-on-surface">Similar Products</h3>
+                      <p className="text-xs text-outline">AI suggested products based on meaning</p>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {data.similar.map(item => renderProductCard(item))}
+                  </div>
+                </div>
+              )}
+
+              {data.keyword && data.keyword.length > 0 && (
+                <div>
+                  <div className="flex items-center gap-2 mb-6">
+                    <span className="material-symbols-outlined text-blue-500 text-3xl">sell</span>
+                    <div>
+                      <h3 className="text-xl font-bold text-on-surface">Related by Keywords</h3>
+                      <p className="text-xs text-outline">Products containing matching tags</p>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {data.keyword.map(item => renderProductCard(item))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </section>

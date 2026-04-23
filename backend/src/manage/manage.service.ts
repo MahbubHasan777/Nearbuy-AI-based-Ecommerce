@@ -5,6 +5,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { Product, ProductDocument } from '../product/schemas/product.schema';
 import { Wishlist, WishlistDocument } from '../wishlist/schemas/wishlist.schema';
 import { UploadService } from '../upload/upload.service';
+import { NotificationService } from '../notification/notification.service';
 
 @Injectable()
 export class ManageService {
@@ -15,6 +16,7 @@ export class ManageService {
     @InjectModel(Wishlist.name)
     private wishlistModel: Model<WishlistDocument>,
     private upload: UploadService,
+    private notificationService: NotificationService,
   ) {}
 
   async listShops(query: any) {
@@ -56,11 +58,25 @@ export class ManageService {
   }
 
   async approveShop(id: string) {
-    return this.prisma.shop.update({ where: { id }, data: { status: 'APPROVED' } });
+    const shop = await this.prisma.shop.update({ where: { id }, data: { status: 'APPROVED' } });
+    await this.notificationService.create(
+      id,
+      'SHOP',
+      'Shop Approved',
+      'Congratulations! Your shop has been approved by the admin. You can now start adding products.'
+    );
+    return shop;
   }
 
   async rejectShop(id: string) {
-    return this.prisma.shop.update({ where: { id }, data: { status: 'REJECTED' } });
+    const shop = await this.prisma.shop.update({ where: { id }, data: { status: 'REJECTED' } });
+    await this.notificationService.create(
+      id,
+      'SHOP',
+      'Shop Rejected',
+      'Unfortunately, your shop application has been rejected by the admin. Please contact support for details.'
+    );
+    return shop;
   }
 
   async toggleShopActive(id: string) {

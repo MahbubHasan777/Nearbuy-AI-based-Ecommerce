@@ -22,6 +22,11 @@ export default function ShopProfilePage() {
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
+  const [activeTab, setActiveTab] = useState('general');
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [savingPassword, setSavingPassword] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const BASE = 'http://localhost:3001/uploads/';
 
@@ -74,6 +79,36 @@ export default function ShopProfilePage() {
     setSaving(false);
   };
 
+  const handleSavePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSavingPassword(true);
+    try {
+      await api.post('/auth/change-password', { currentPassword, newPassword });
+      alert('Password updated successfully!');
+      setCurrentPassword('');
+      setNewPassword('');
+    } catch (err: any) {
+      alert(err.response?.data?.message || 'Failed to change password.');
+    } finally {
+      setSavingPassword(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    if (!confirm('Are you absolutely sure you want to permanently delete your shop account? This action cannot be undone.')) return;
+    setDeleting(true);
+    try {
+      // Assuming a DELETE /shop/account endpoint
+      await api.delete('/shop/account');
+      alert('Your shop account has been deleted.');
+      localStorage.removeItem('token');
+      window.location.href = '/login';
+    } catch {
+      alert('Failed to delete account.');
+      setDeleting(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background font-sans">
       <TopNavBar variant="shop" />
@@ -86,11 +121,17 @@ export default function ShopProfilePage() {
             <p className="text-outline mt-1">Update your shop&apos;s public profile</p>
           </div>
 
+          <div className="flex gap-2 mb-6 border-b border-slate-100 pb-2">
+            <button onClick={() => setActiveTab('general')} className={`px-4 py-2 font-bold text-sm rounded-lg transition-colors ${activeTab === 'general' ? 'bg-primary-container text-white' : 'text-on-surface-variant hover:bg-surface-container'}`}>General</button>
+            <button onClick={() => setActiveTab('password')} className={`px-4 py-2 font-bold text-sm rounded-lg transition-colors ${activeTab === 'password' ? 'bg-primary-container text-white' : 'text-on-surface-variant hover:bg-surface-container'}`}>Password</button>
+            <button onClick={() => setActiveTab('delete')} className={`px-4 py-2 font-bold text-sm rounded-lg transition-colors ${activeTab === 'delete' ? 'bg-error text-white' : 'text-error hover:bg-error-container/20'}`}>Danger Zone</button>
+          </div>
+
           {dataLoading ? (
             <div className="flex justify-center py-20">
               <div className="w-10 h-10 border-4 border-primary-container border-t-transparent rounded-full animate-spin" />
             </div>
-          ) : (
+          ) : activeTab === 'general' ? (
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="bg-white rounded-2xl shadow-card border border-slate-100 p-6">
                 <h2 className="text-lg font-bold text-on-surface border-b border-slate-100 pb-3 mb-6">
@@ -199,7 +240,38 @@ export default function ShopProfilePage() {
                 {saving ? 'Saving...' : 'Save Changes'}
               </button>
             </form>
-          )}
+          ) : activeTab === 'password' ? (
+            <div className="bg-white rounded-2xl shadow-card border border-slate-100 p-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <h3 className="text-xl font-bold text-on-surface mb-6 border-b border-slate-100 pb-4">Change Password</h3>
+              <form onSubmit={handleSavePassword} className="space-y-5">
+                <div>
+                  <label className="block text-xs font-bold text-outline uppercase tracking-wider mb-2">Current Password</label>
+                  <input type="password" value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} required
+                    className="w-full border border-outline-variant rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 outline-none" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-outline uppercase tracking-wider mb-2">New Password</label>
+                  <input type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)} required minLength={6}
+                    className="w-full border border-outline-variant rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 outline-none" />
+                </div>
+                <button type="submit" disabled={savingPassword}
+                  className="w-full py-4 bg-primary text-white font-bold rounded-xl shadow-lg hover:bg-primary/90 transition-colors disabled:opacity-60">
+                  {savingPassword ? 'Updating...' : 'Update Password'}
+                </button>
+              </form>
+            </div>
+          ) : activeTab === 'delete' ? (
+            <div className="bg-error-container/10 border border-error/20 rounded-2xl p-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <h3 className="text-xl font-bold text-error mb-2">Delete Shop Account</h3>
+              <p className="text-sm text-on-surface-variant mb-6">
+                Once you delete your shop account, all your products, reviews, and data will be permanently removed. There is no going back. Please be certain.
+              </p>
+              <button onClick={handleDeleteAccount} disabled={deleting}
+                className="w-full md:w-auto px-6 py-4 bg-error text-white font-bold rounded-xl shadow hover:bg-error/90 transition-colors disabled:opacity-60">
+                {deleting ? 'Deleting...' : 'Permanently Delete Shop Account'}
+              </button>
+            </div>
+          ) : null}
         </main>
       </div>
       <BottomNavBar variant="shop" />

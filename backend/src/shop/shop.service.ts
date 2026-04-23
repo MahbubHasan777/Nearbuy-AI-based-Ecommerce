@@ -119,8 +119,8 @@ export class ShopService {
     });
   }
 
-  async deactivateAccount(shopId: string) {
-    await this.prisma.shop.update({ where: { id: shopId }, data: { isActive: false } });
-    return { message: 'Account deactivated' };
+  async deleteAccount(shopId: string) {
+    await this.prisma.shop.delete({ where: { id: shopId } });
+    return { message: 'Account deleted successfully' };
   }
 }

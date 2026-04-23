@@ -9,6 +9,7 @@ import { Model } from 'mongoose';
 import { Wishlist, WishlistDocument } from './schemas/wishlist.schema';
 import { Product, ProductDocument } from '../product/schemas/product.schema';
 import { PrismaService } from '../prisma/prisma.service';
+import { NotificationService } from '../notification/notification.service';
 
 @Injectable()
 export class WishlistService {
@@ -18,6 +19,7 @@ export class WishlistService {
     @InjectModel(Product.name)
     private productModel: Model<ProductDocument>,
     private prisma: PrismaService,
+    private notificationService: NotificationService,
   ) {}
 
   async getCustomerWishlist(customerId: string) {
@@ -87,6 +89,14 @@ export class WishlistService {
           price: product.discountPrice || product.price,
         },
       });
+      
+      const shop = await this.prisma.shop.findUnique({ where: { id: shopId } });
+      await this.notificationService.create(
+        item.customerId,
+        'CUSTOMER',
+        'Wishlist Fulfilled',
+        `Your wishlist item "${product.name}" has been fulfilled by ${shop?.shopName || 'the shop'}. You can now pick it up!`
+      );
     }
 
     return { message: 'Marked as done' };
@@ -99,6 +109,18 @@ export class WishlistService {
 
     item.status = 'REJECTED';
     await item.save();
+
+    const product = await this.productModel.findById(item.productId);
+    const shop = await this.prisma.shop.findUnique({ where: { id: shopId } });
+    if (product) {
+      await this.notificationService.create(
+        item.customerId,
+        'CUSTOMER',
+        'Wishlist Rejected',
+        `Your wishlist request for "${product.name}" was rejected by ${shop?.shopName || 'the shop'}.`
+      );
+    }
+
     return { message: 'Wishlist request rejected' };
   }
 

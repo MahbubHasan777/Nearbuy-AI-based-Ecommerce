@@ -105,7 +105,7 @@ export class ShopController {
   @UseGuards(TokenGuard, RolesGuard)
   @Roles('SHOP')
   @HttpCode(200)
-  async deactivate(@Req() req: any) {
-    return this.shopService.deactivateAccount(req.user.id);
+  async deleteAccount(@Req() req: any) {
+    return this.shopService.deleteAccount(req.user.id);
   }
 }

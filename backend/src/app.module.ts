@@ -17,6 +17,7 @@ import { SearchModule } from './search/search.module';
 import { GeoModule } from './geo/geo.module';
 import { UploadModule } from './upload/upload.module';
 import { ShopsPublicModule } from './shop/shops-public.module';
+import { NotificationModule } from './notification/notification.module';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { ShopsPublicModule } from './shop/shops-public.module';
     GeoModule,
     UploadModule,
     ShopsPublicModule,
+    NotificationModule,
   ],
 })
 export class AppModule {}
