@@ -143,8 +143,8 @@ export default function ProductDetailPage() {
                 <span className="text-on-surface-variant text-xs bg-surface-container px-2 py-1 rounded font-semibold">{product.status}</span>
               </div>
               <div className="flex items-baseline gap-3 mb-4">
-                <span className="text-3xl font-bold text-primary">${(product.discountPrice ?? product.price).toFixed(2)}</span>
-                {product.discountPrice && <span className="text-outline line-through">${product.price.toFixed(2)}</span>}
+                <span className="text-3xl font-bold text-primary">৳{(product.discountPrice ?? product.price).toFixed(2)}</span>
+                {product.discountPrice && <span className="text-outline line-through">৳{product.price.toFixed(2)}</span>}
                 {product.discountPercentage && (
                   <span className="bg-tertiary-container text-on-tertiary text-xs px-2 py-0.5 rounded-full font-bold">{product.discountPercentage}% OFF</span>
                 )}

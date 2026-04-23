@@ -171,7 +171,7 @@ function SearchContent() {
                         <h3 className="font-semibold text-[17px] text-on-surface line-clamp-1">{item.productName}</h3>
                         <div className="text-right flex flex-col items-end">
                           <span className="text-primary font-semibold text-[17px]">
-                            ${item.discountPrice ?? item.price}
+                            ৳{item.discountPrice ?? item.price}
                           </span>
                           {item.averageRating > 0 && (
                             <div className="flex items-center gap-0.5 text-amber-500 mt-1">
