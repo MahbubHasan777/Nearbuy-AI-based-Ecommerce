@@ -23,7 +23,7 @@ export default function ShopProfilePage() {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
   const fileRef = useRef<HTMLInputElement>(null);
-  const BASE = 'http://localhost:3001/';
+  const BASE = 'http://localhost:3001/uploads/';
 
   useEffect(() => {
     api.get('/shop/profile').then(r => {

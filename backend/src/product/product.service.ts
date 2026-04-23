@@ -21,10 +21,25 @@ export class ProductService {
     @InjectQueue('product-processing')
     private productQueue: Queue,
     private upload: UploadService,
+    @InjectModel('Category') private categoryModel: Model<any>,
+    @InjectModel('Brand') private brandModel: Model<any>,
   ) {}
 
   async findByShop(shopId: string) {
-    return this.productModel.find({ shopId }).sort({ createdAt: -1 });
+    const products = await this.productModel.find({ shopId }).sort({ createdAt: -1 }).lean();
+    
+    // Fetch all categories and brands for this shop to manually populate
+    const categories = await this.categoryModel.find({ shopId }).lean();
+    const brands = await this.brandModel.find({ shopId }).lean();
+    
+    const catMap = new Map(categories.map(c => [c._id.toString(), c]));
+    const brandMap = new Map(brands.map(b => [b._id.toString(), b]));
+
+    return products.map(p => ({
+      ...p,
+      category: catMap.get(p.categoryId as string) || null,
+      brand: brandMap.get(p.brandId as string) || null
+    }));
   }
 
   async create(

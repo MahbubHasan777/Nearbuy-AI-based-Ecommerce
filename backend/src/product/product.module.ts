@@ -5,12 +5,18 @@ import { ProductController } from './product.controller';
 import { ProductService } from './product.service';
 import { ProductProcessor } from './product-processor.consumer';
 import { Product, ProductSchema } from './schemas/product.schema';
+import { Category, CategorySchema } from '../category/schemas/category.schema';
+import { Brand, BrandSchema } from '../brand/schemas/brand.schema';
 import { UploadModule } from '../upload/upload.module';
 import { AuthModule } from '../auth/auth.module';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: Product.name, schema: ProductSchema }]),
+    MongooseModule.forFeature([
+      { name: Product.name, schema: ProductSchema },
+      { name: Category.name, schema: CategorySchema },
+      { name: Brand.name, schema: BrandSchema },
+    ]),
     BullModule.registerQueue({ name: 'product-processing' }),
     UploadModule,
     AuthModule,
