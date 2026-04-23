@@ -146,18 +146,21 @@ export class CustomerService {
     
     // Aggregate ratings from products for these shops
     const aggregations = await this.productModel.aggregate([
-      { $match: { shopId: { $in: shopIds } } },
+      { $match: { shopId: { $in: shopIds }, totalRatings: { $gt: 0 } } },
       { $group: {
           _id: '$shopId',
           totalRatings: { $sum: '$totalRatings' },
-          averageRating: { $avg: '$averageRating' }
+          totalScore: { $sum: { $multiply: ['$averageRating', '$totalRatings'] } }
         }
       }
     ]);
 
     const ratingMap = new Map(aggregations.map(a => [
       a._id, 
-      { totalRatings: a.totalRatings, averageRating: Math.round(a.averageRating * 10) / 10 }
+      { 
+        totalRatings: a.totalRatings, 
+        averageRating: a.totalRatings > 0 ? Math.round((a.totalScore / a.totalRatings) * 10) / 10 : 0 
+      }
     ]));
 
     return shops.map(shop => {

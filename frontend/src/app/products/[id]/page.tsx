@@ -256,11 +256,15 @@ export default function ProductDetailPage() {
                 {reviews.map(r => (
                   <div key={r._id} className="p-6 bg-white rounded-2xl shadow-sm border border-slate-100">
                     <div className="flex items-center gap-3 mb-3">
-                      <div className="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center">
-                        <span className="material-symbols-outlined text-outline">person</span>
+                      <div className="w-10 h-10 rounded-full bg-surface-container overflow-hidden flex flex-shrink-0 items-center justify-center">
+                        {r.customer?.profilePic ? (
+                          <img src={`http://localhost:3001/uploads/${r.customer.profilePic}`} className="w-full h-full object-cover" alt="" />
+                        ) : (
+                          <span className="material-symbols-outlined text-outline">person</span>
+                        )}
                       </div>
                       <div>
-                        <p className="text-sm font-bold">Customer</p>
+                        <p className="text-sm font-bold">{r.customer?.fullName || 'Customer'}</p>
                         <p className="text-xs text-outline">{new Date(r.createdAt).toLocaleDateString()}</p>
                       </div>
                       <div className="ml-auto flex text-secondary">

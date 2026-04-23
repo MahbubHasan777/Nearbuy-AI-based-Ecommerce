@@ -167,11 +167,20 @@ function SearchContent() {
                       </button>
                     </div>
                     <div className="p-5 flex-1 flex flex-col">
-                      <div className="flex justify-between items-start mb-2">
+                      <div className="flex justify-between items-start mb-1">
                         <h3 className="font-semibold text-[17px] text-on-surface line-clamp-1">{item.productName}</h3>
-                        <span className="text-primary font-semibold text-[17px]">
-                          ${item.discountPrice ?? item.price}
-                        </span>
+                        <div className="text-right flex flex-col items-end">
+                          <span className="text-primary font-semibold text-[17px]">
+                            ${item.discountPrice ?? item.price}
+                          </span>
+                          {item.averageRating > 0 && (
+                            <div className="flex items-center gap-0.5 text-amber-500 mt-1">
+                              <span className="material-symbols-outlined text-[14px] fill-icon">star</span>
+                              <span className="text-xs text-on-surface-variant font-bold">{item.averageRating.toFixed(1)}</span>
+                              <span className="text-[10px] text-outline ml-0.5">({item.totalRatings})</span>
+                            </div>
+                          )}
+                        </div>
                       </div>
                       {item.shop && (
                         <div className="flex items-center gap-2 mb-4">

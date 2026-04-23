@@ -6,6 +6,7 @@ import { Review, ReviewSchema } from './schemas/review.schema';
 import { Wishlist, WishlistSchema } from '../wishlist/schemas/wishlist.schema';
 import { Product, ProductSchema } from '../product/schemas/product.schema';
 import { AuthModule } from '../auth/auth.module';
+import { PrismaModule } from '../prisma/prisma.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { AuthModule } from '../auth/auth.module';
       { name: Product.name, schema: ProductSchema },
     ]),
     AuthModule,
+    PrismaModule,
   ],
   controllers: [ReviewController],
   providers: [ReviewService],

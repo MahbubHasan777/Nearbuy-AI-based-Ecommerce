@@ -210,9 +210,10 @@ export default function ShopPublicPage() {
                             )}
                           </div>
                           {p.averageRating > 0 && (
-                            <div className="flex items-center gap-0.5 text-amber-400">
+                            <div className="flex items-center gap-0.5 text-amber-500">
                               <span className="material-symbols-outlined text-sm fill-icon">star</span>
-                              <span className="text-xs text-on-surface-variant font-semibold">{p.averageRating.toFixed(1)}</span>
+                              <span className="text-xs text-on-surface-variant font-bold">{p.averageRating.toFixed(1)}</span>
+                              <span className="text-[10px] text-outline ml-0.5">({p.totalRatings})</span>
                             </div>
                           )}
                         </div>
