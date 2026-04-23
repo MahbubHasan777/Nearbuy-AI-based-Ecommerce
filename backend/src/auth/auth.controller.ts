@@ -16,6 +16,7 @@ import {
   VerifyOtpDto,
   ResetPasswordDto,
 } from './dto/forgot-password.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
 import { TokenGuard } from './guards/token.guard';
 
 @Controller('auth')
@@ -92,5 +93,18 @@ export class AuthController {
   async resetPassword(@Body() dto: ResetPasswordDto) {
     await this.authService.resetPassword(dto.email, dto.otp, dto.newPassword);
     return { message: 'Password reset successful' };
+  }
+
+  @Post('change-password')
+  @UseGuards(TokenGuard)
+  @HttpCode(200)
+  async changePassword(@Req() req: any, @Body() dto: ChangePasswordDto) {
+    await this.authService.changePassword(
+      req.user.id,
+      req.user.role,
+      dto.oldPassword,
+      dto.newPassword,
+    );
+    return { message: 'Password changed successfully' };
   }
 }

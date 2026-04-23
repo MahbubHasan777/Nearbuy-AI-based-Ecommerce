@@ -157,4 +157,31 @@ export class AuthService {
 
     await this.prisma.oTP.update({ where: { id: record.id }, data: { used: true } });
   }
+
+  async changePassword(userId: string, userType: string, oldPass: string, newPass: string) {
+    let userModel: any;
+    let user: any;
+
+    if (userType === 'CUSTOMER') {
+      userModel = this.prisma.customer;
+      user = await userModel.findUnique({ where: { id: userId } });
+    } else if (userType === 'SHOP') {
+      userModel = this.prisma.shop;
+      user = await userModel.findUnique({ where: { id: userId } });
+    } else if (userType === 'ADMIN') {
+      userModel = this.prisma.admin;
+      user = await userModel.findUnique({ where: { id: userId } });
+    } else if (userType === 'MODERATOR') {
+      userModel = this.prisma.moderator;
+      user = await userModel.findUnique({ where: { id: userId } });
+    }
+
+    if (!user) throw new BadRequestException('User not found');
+
+    const isValid = await bcrypt.compare(oldPass, user.passwordHash);
+    if (!isValid) throw new BadRequestException('Incorrect old password');
+
+    const hash = await bcrypt.hash(newPass, 12);
+    await userModel.update({ where: { id: userId }, data: { passwordHash: hash } });
+  }
 }

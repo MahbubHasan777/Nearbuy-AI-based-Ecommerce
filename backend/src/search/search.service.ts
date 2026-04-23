@@ -32,40 +32,82 @@ export class SearchService {
             .map((s) => (s as any).id as string)
         : allShops.map((s) => s.id as string);
 
-    let queryProductIds: string[] = [];
-    try {
-      const response = await fetch('http://localhost:8000/query', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: query, n_results: 50 }),
-      });
-      const data = await response.json();
-      if (data.results) {
-        queryProductIds = data.results.map((r: any) => r.product_id);
+    let queryProductIds: string[] | null = null;
+    if (query.trim()) {
+      try {
+        const response = await fetch('http://localhost:8000/query', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query: query, n_results: 50 }),
+        });
+        if (response.ok) {
+          const data = await response.json();
+          if (data.results) {
+            queryProductIds = data.results.map((r: any) => r.product_id);
+          }
+        } else {
+          throw new Error('ChromaDB returned ' + response.status);
+        }
+      } catch (err) {
+        console.error('ChromaDB search failed, falling back to fuzzy match:', err.message);
       }
-    } catch (err) {
-      console.error('ChromaDB search failed:', err);
-      queryProductIds = [];
     }
 
-    const products = await this.productModel.find({
-      _id: { $in: queryProductIds },
-      shopId: { $in: nearbyShopIds },
-    });
+    const filter: any = { shopId: { $in: nearbyShopIds } };
+    if (queryProductIds !== null && queryProductIds.length > 0) {
+      filter._id = { $in: queryProductIds };
+    }
 
+    const products = await this.productModel.find(filter);
+
+    const q = query.toLowerCase().trim();
     const scored = products.map((p) => {
+      let score = 0;
+      if (queryProductIds !== null) {
+        // ChromaDB scoring
+        const index = queryProductIds.indexOf(p._id.toString());
+        if (index !== -1) score = queryProductIds.length - index;
+      } else if (q) {
+        // Fallback fuzzy scoring
+        const name = p.name.toLowerCase();
+        const keywords = ((p.imageKeywords as string[]) || []).map((k) => k.toLowerCase());
+
+        if (name === q) {
+          score = 100;
+        } else {
+          const qTokens = q.split(' ');
+          const nameTokens = name.split(' ');
+
+          const prefixMatches = qTokens.filter((qt) =>
+            nameTokens.some((nt) => nt.startsWith(qt)),
+          ).length;
+          if (prefixMatches > 0) score += (prefixMatches / qTokens.length) * 75;
+
+          const fuzzyScore = this.maxSimilarity(q, name);
+          if (fuzzyScore >= 0.6) score += fuzzyScore * 50;
+
+          const kwMatches = qTokens.filter((qt) =>
+            keywords.some((kw) => kw.includes(qt)),
+          ).length;
+          if (kwMatches === 1) score += 10;
+          else if (kwMatches === 2) score += 30;
+          else if (kwMatches >= 3) score += 50;
+        }
+        if (score === 0) return null;
+      } else {
+        score = 1; // no query
+      }
+
       if (params['minPrice'] && p.price < Number(params['minPrice'])) return null;
       if (params['maxPrice'] && p.price > Number(params['maxPrice'])) return null;
       if (params['minRating'] && p.averageRating < Number(params['minRating'])) return null;
       if (params['maxRating'] && p.averageRating > Number(params['maxRating'])) return null;
 
-      // Preserve the order returned by ChromaDB (which returns sorted by distance)
-      const index = queryProductIds.indexOf(p._id.toString());
-      return { product: p, score: queryProductIds.length - index }; 
+      return { product: p, score }; 
     });
 
     const filtered = scored.filter(Boolean) as { product: any; score: number }[];
-    filtered.sort((a, b) => b.score - a.score);
+    if (q) filtered.sort((a, b) => b.score - a.score);
 
     const sorted = this.applySort(filtered.map((f) => f.product), params['sort']);
     const shopMap = new Map<string, any>(allShops.map((s) => [s.id, s]));
@@ -103,34 +145,64 @@ export class SearchService {
   }
 
   async searchInShop(shopId: string, query: string, params: Record<string, string>) {
-    let queryProductIds: string[] = [];
-    try {
-      const response = await fetch('http://localhost:8000/query', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: query, n_results: 50 }),
-      });
-      const data = await response.json();
-      if (data.results) {
-        queryProductIds = data.results.map((r: any) => r.product_id);
+    let queryProductIds: string[] | null = null;
+    const q = query.toLowerCase().trim();
+    if (q) {
+      try {
+        const response = await fetch('http://localhost:8000/query', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query: query, n_results: 50 }),
+        });
+        if (response.ok) {
+          const data = await response.json();
+          if (data.results) {
+            queryProductIds = data.results.map((r: any) => r.product_id);
+          }
+        } else {
+          throw new Error('ChromaDB returned ' + response.status);
+        }
+      } catch (err) {
+        console.error('ChromaDB shop search failed:', err.message);
       }
-    } catch (err) {
-      console.error('ChromaDB shop search failed:', err);
     }
 
-    const products = await this.productModel.find({
-      _id: { $in: queryProductIds },
-      shopId,
-    });
+    const filter: any = { shopId };
+    if (queryProductIds !== null && queryProductIds.length > 0) {
+      filter._id = { $in: queryProductIds };
+    }
+
+    const products = await this.productModel.find(filter);
 
     const scored = products
       .map((p) => {
-        const index = queryProductIds.indexOf(p._id.toString());
-        return { product: p, score: queryProductIds.length - index };
+        let score = 0;
+        if (queryProductIds !== null) {
+          const index = queryProductIds.indexOf(p._id.toString());
+          if (index !== -1) score = queryProductIds.length - index;
+        } else if (q) {
+          const name = p.name.toLowerCase();
+          if (name === q) score = 100;
+          else {
+            const qTokens = q.split(' ');
+            const nameTokens = name.split(' ');
+            const prefixMatches = qTokens.filter((qt) =>
+              nameTokens.some((nt) => nt.startsWith(qt)),
+            ).length;
+            if (prefixMatches > 0) score += (prefixMatches / qTokens.length) * 75;
+
+            const fuzzyScore = this.maxSimilarity(q, name);
+            if (fuzzyScore >= 0.6) score += fuzzyScore * 50;
+          }
+          if (score === 0) return null;
+        } else {
+          score = 1;
+        }
+        return { product: p, score };
       })
       .filter(Boolean) as { product: any; score: number }[];
 
-    scored.sort((a, b) => b.score - a.score);
+    if (q) scored.sort((a, b) => b.score - a.score);
     return { query, total: scored.length, results: scored.map((s) => s.product) };
   }
 
@@ -149,5 +221,39 @@ export class SearchService {
     return [...products].sort(map[sort] || (() => 0));
   }
 
+  private levenshtein(a: string, b: string): number {
+    const dp: number[][] = Array.from({ length: a.length + 1 }, (_, i) =>
+      Array.from({ length: b.length + 1 }, (_, j) =>
+        i === 0 ? j : j === 0 ? i : 0,
+      ),
+    );
+    for (let i = 1; i <= a.length; i++) {
+      for (let j = 1; j <= b.length; j++) {
+        dp[i][j] =
+          a[i - 1] === b[j - 1]
+            ? dp[i - 1][j - 1]
+            : 1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]);
+      }
+    }
+    return dp[a.length][b.length];
+  }
 
+  private similarity(a: string, b: string): number {
+    const maxLen = Math.max(a.length, b.length);
+    if (maxLen === 0) return 1;
+    return 1 - this.levenshtein(a, b) / maxLen;
+  }
+
+  private maxSimilarity(query: string, name: string): number {
+    const qTokens = query.split(' ');
+    const nTokens = name.split(' ');
+    let max = 0;
+    for (const qt of qTokens) {
+      for (const nt of nTokens) {
+        const s = this.similarity(qt, nt);
+        if (s > max) max = s;
+      }
+    }
+    return max;
+  }
 }
