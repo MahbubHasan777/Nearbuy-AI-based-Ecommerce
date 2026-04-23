@@ -23,8 +23,9 @@ export default function CustomerProfilePage() {
     { icon: 'favorite', label: 'My Wishlist', href: '/wishlist', color: 'text-error' },
     { icon: 'location_on', label: 'Saved Addresses', href: '/profile/addresses', color: 'text-primary' },
     { icon: 'notifications', label: 'Notifications', href: '/profile/notifications', color: 'text-secondary' },
-    { icon: 'lock', label: 'Change Password', href: '/profile/password', color: 'text-outline' },
-    { icon: 'help', label: 'Help & Support', href: '/help', color: 'text-outline' },
+    { icon: 'manage_accounts', label: 'Account Settings', href: '/profile/settings', color: 'text-primary' },
+    { icon: 'lock', label: 'Change Password', href: '/profile/settings?tab=password', color: 'text-outline' },
+    { icon: 'delete', label: 'Delete Account', href: '/profile/settings?tab=delete', color: 'text-error' },
     { icon: 'info', label: 'About NearBuy', href: '/about', color: 'text-outline' },
   ];
 

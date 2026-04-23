@@ -29,7 +29,7 @@ export default function OrdersPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    api.get('/customer/orders').then(r => setOrders(r.data)).catch(() => {}).finally(() => setLoading(false));
+    api.get('/customer/orders').then(r => setOrders(r.data)).catch(() => { }).finally(() => setLoading(false));
   }, []);
 
   const BASE = 'http://localhost:3001/uploads/';
@@ -82,7 +82,7 @@ export default function OrdersPage() {
                   )}
                   <div className="flex items-center justify-between mt-3">
                     {order.product?.price && (
-                      <p className="text-sm font-bold text-primary">${order.product.price.toFixed(2)}</p>
+                      <p className="text-sm font-bold text-primary"> ৳{order.product.price.toFixed(2)}</p>
                     )}
                     <div className="flex items-center gap-3">
                       <p className="text-xs text-outline">{new Date(order.createdAt || order.markedAt || Date.now()).toLocaleDateString()}</p>

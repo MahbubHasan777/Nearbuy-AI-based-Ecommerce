@@ -197,8 +197,24 @@ export default function ProductDetailPage() {
           </div>
 
           {activeTab === 'desc' && (
-            <div className="py-8">
-              <p className="text-on-surface-variant leading-relaxed text-base">{product.description || 'No description available.'}</p>
+            <div className="py-8 space-y-10">
+              {product.specification && (
+                <div>
+                  <h3 className="text-xl font-bold text-on-surface mb-4">Specifications</h3>
+                  <div className="bg-surface-container-low rounded-2xl p-6 border border-outline-variant/30">
+                    <p className="text-on-surface-variant whitespace-pre-wrap leading-relaxed text-[15px]">{product.specification}</p>
+                  </div>
+                </div>
+              )}
+              <div>
+                <h3 className="text-xl font-bold text-on-surface mb-4">Product Details</h3>
+                {product.description ? (
+                  <div className="prose prose-slate max-w-none prose-headings:font-bold prose-a:text-primary hover:prose-a:text-primary/80" 
+                    dangerouslySetInnerHTML={{ __html: product.description }} />
+                ) : (
+                  <p className="text-on-surface-variant leading-relaxed text-base">No description available.</p>
+                )}
+              </div>
             </div>
           )}
 

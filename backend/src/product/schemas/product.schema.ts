@@ -20,6 +20,9 @@ export class Product {
   @Prop()
   description: string;
 
+  @Prop()
+  specification: string;
+
   @Prop({ required: true })
   price: number;
 

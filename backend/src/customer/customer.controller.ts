@@ -121,7 +121,7 @@ export class CustomerController {
   @UseGuards(TokenGuard, RolesGuard)
   @Roles('CUSTOMER')
   @HttpCode(200)
-  async deactivate(@Req() req: any) {
-    return this.customerService.deactivateAccount(req.user.id);
+  async deleteAccount(@Req() req: any) {
+    return this.customerService.deleteAccount(req.user.id);
   }
 }

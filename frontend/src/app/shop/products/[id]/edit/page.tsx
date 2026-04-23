@@ -4,6 +4,10 @@ import { useParams, useRouter } from 'next/navigation';
 import TopNavBar from '@/components/TopNavBar';
 import api from '@/lib/api';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
+import 'react-quill/dist/quill.snow.css';
+
+const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
 
 interface Category { _id: string; name: string; }
 interface Brand { _id: string; name: string; }
@@ -14,7 +18,7 @@ export default function EditProductPage() {
 
   const [form, setForm] = useState({
     name: '', price: '', discountPrice: '',
-    discountPercentage: '', description: '',
+    discountPercentage: '', description: '', specification: '',
     categoryId: '', brandId: '', status: 'IN_STOCK',
   });
   const [categories, setCategories] = useState<Category[]>([]);
@@ -39,6 +43,7 @@ export default function EditProductPage() {
         discountPrice: p.discountPrice ? String(p.discountPrice) : '',
         discountPercentage: p.discountPercentage ? String(p.discountPercentage) : '',
         description: p.description ?? '',
+        specification: p.specification ?? '',
         categoryId: p.categoryId ?? '',
         brandId: p.brandId ?? '',
         status: p.status ?? 'IN_STOCK',
@@ -64,6 +69,7 @@ export default function EditProductPage() {
       if (form.discountPrice) fd.append('discountPrice', form.discountPrice);
       if (form.discountPercentage) fd.append('discountPercentage', form.discountPercentage);
       if (form.description) fd.append('description', form.description);
+      if (form.specification) fd.append('specification', form.specification);
       if (form.categoryId) fd.append('categoryId', form.categoryId);
       if (form.brandId) fd.append('brandId', form.brandId);
       if (form.status) fd.append('status', form.status);
@@ -129,9 +135,19 @@ export default function EditProductPage() {
 
             <div>
               <label className="block text-xs font-bold text-outline uppercase tracking-wider mb-2">Description</label>
-              <textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
+              <div className="bg-surface-container-low border border-outline-variant rounded-xl overflow-hidden text-sm [&_.ql-toolbar]:border-none [&_.ql-toolbar]:border-b [&_.ql-toolbar]:border-outline-variant [&_.ql-container]:border-none [&_.ql-editor]:min-h-[150px]">
+                <ReactQuill theme="snow" value={form.description} onChange={val => setForm(f => ({ ...f, description: val }))} />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-outline uppercase tracking-wider mb-2">Specification (Max 100 words)</label>
+              <textarea value={form.specification} onChange={e => {
+                const words = e.target.value.trim().split(/\s+/);
+                if (words.length <= 100 || e.target.value === '') setForm(f => ({ ...f, specification: e.target.value }));
+              }}
                 className="w-full border border-outline-variant rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none min-h-[100px] resize-y"
-                placeholder="Describe your product..." />
+                placeholder="Product specifications..." />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
