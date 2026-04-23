@@ -54,26 +54,28 @@ export class SearchService {
     }
 
     const filter: any = { shopId: { $in: nearbyShopIds } };
-    if (queryProductIds !== null && queryProductIds.length > 0) {
-      filter._id = { $in: queryProductIds };
-    }
-
     const products = await this.productModel.find(filter);
 
     const q = query.toLowerCase().trim();
     const scored = products.map((p) => {
       let score = 0;
+      
+      // ChromaDB scoring
       if (queryProductIds !== null) {
-        // ChromaDB scoring
         const index = queryProductIds.indexOf(p._id.toString());
-        if (index !== -1) score = queryProductIds.length - index;
-      } else if (q) {
-        // Fallback fuzzy scoring
+        if (index !== -1) {
+          // Add a high baseline score for semantic relevance, up to 100 points
+          score += 50 + ((queryProductIds.length - index) / queryProductIds.length) * 50; 
+        }
+      } 
+      
+      // Fuzzy string scoring
+      if (q) {
         const name = p.name.toLowerCase();
         const keywords = ((p.imageKeywords as string[]) || []).map((k) => k.toLowerCase());
 
         if (name === q) {
-          score = 100;
+          score += 150; // Exact match heavily favored
         } else {
           const qTokens = q.split(' ');
           const nameTokens = name.split(' ');
@@ -93,10 +95,11 @@ export class SearchService {
           else if (kwMatches === 2) score += 30;
           else if (kwMatches >= 3) score += 50;
         }
-        if (score === 0) return null;
       } else {
         score = 1; // no query
       }
+
+      if (score === 0) return null;
 
       if (params['minPrice'] && p.price < Number(params['minPrice'])) return null;
       if (params['maxPrice'] && p.price > Number(params['maxPrice'])) return null;
@@ -168,21 +171,22 @@ export class SearchService {
     }
 
     const filter: any = { shopId };
-    if (queryProductIds !== null && queryProductIds.length > 0) {
-      filter._id = { $in: queryProductIds };
-    }
-
     const products = await this.productModel.find(filter);
 
     const scored = products
       .map((p) => {
         let score = 0;
+        
         if (queryProductIds !== null) {
           const index = queryProductIds.indexOf(p._id.toString());
-          if (index !== -1) score = queryProductIds.length - index;
-        } else if (q) {
+          if (index !== -1) {
+            score += 50 + ((queryProductIds.length - index) / queryProductIds.length) * 50;
+          }
+        } 
+        
+        if (q) {
           const name = p.name.toLowerCase();
-          if (name === q) score = 100;
+          if (name === q) score += 150;
           else {
             const qTokens = q.split(' ');
             const nameTokens = name.split(' ');
@@ -194,10 +198,11 @@ export class SearchService {
             const fuzzyScore = this.maxSimilarity(q, name);
             if (fuzzyScore >= 0.6) score += fuzzyScore * 50;
           }
-          if (score === 0) return null;
         } else {
           score = 1;
         }
+        
+        if (score === 0) return null;
         return { product: p, score };
       })
       .filter(Boolean) as { product: any; score: number }[];
