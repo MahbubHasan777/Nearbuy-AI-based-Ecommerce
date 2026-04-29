@@ -50,7 +50,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try { await api.post('/auth/logout'); } catch {}
     localStorage.removeItem('auth_token');
     setUser(null);
-    router.push('/login');
+    window.location.href = '/login';
   };
 
   return (

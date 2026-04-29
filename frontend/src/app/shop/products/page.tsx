@@ -27,7 +27,12 @@ export default function ShopProductsPage() {
 
   const fetchProducts = () => {
     setLoading(true);
-    api.get('/shop/products').then(r => setProducts(Array.isArray(r.data) ? r.data : [])).catch(() => {}).finally(() => setLoading(false));
+    api.get(`/shop/products?t=${Date.now()}`)
+      .then(r => setProducts(Array.isArray(r.data) ? r.data : []))
+      .catch((err) => {
+        console.error('Failed to load products:', err);
+      })
+      .finally(() => setLoading(false));
   };
 
   useEffect(() => {

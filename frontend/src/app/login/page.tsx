@@ -17,11 +17,12 @@ export default function LoginPage() {
     setLoading(true);
     try {
       await login(form.email, form.password, form.userType);
-      if (form.userType === 'CUSTOMER') router.push('/');
-      else if (form.userType === 'SHOP') router.push('/shop/dashboard');
-      else router.push('/admin/dashboard');
-    } catch {
-      setError('Invalid email or password');
+      if (form.userType === 'CUSTOMER') window.location.href = '/';
+      else if (form.userType === 'SHOP') window.location.href = '/shop/dashboard';
+      else window.location.href = '/admin/dashboard';
+    } catch (err: any) {
+      const msg = err?.response?.data?.message;
+      setError(typeof msg === 'string' ? msg : (Array.isArray(msg) ? msg[0] : 'Invalid email or password'));
     } finally {
       setLoading(false);
     }

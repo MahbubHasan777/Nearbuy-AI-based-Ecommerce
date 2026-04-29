@@ -44,8 +44,14 @@ export class AuthController {
   @UseGuards(TokenGuard)
   @HttpCode(200)
   async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
-    const token = req.cookies?.['auth_token'];
-    await this.authService.logout(token);
+    let token = req.cookies?.['auth_token'];
+    if (!token && req.headers.authorization?.startsWith('Bearer ')) {
+      token = req.headers.authorization.split(' ')[1];
+    }
+    
+    if (token) {
+      await this.authService.logout(token);
+    }
     res.clearCookie('auth_token');
     return { message: 'Logged out' };
   }

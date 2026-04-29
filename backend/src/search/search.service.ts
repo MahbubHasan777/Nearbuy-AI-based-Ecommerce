@@ -32,26 +32,7 @@ export class SearchService {
             .map((s) => (s as any).id as string)
         : allShops.map((s) => s.id as string);
 
-    let queryProductIds: string[] | null = null;
-    if (query.trim()) {
-      try {
-        const response = await fetch('http://localhost:8000/query', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ query: query, n_results: 50 }),
-        });
-        if (response.ok) {
-          const data = await response.json();
-          if (data.results) {
-            queryProductIds = data.results.map((r: any) => r.product_id);
-          }
-        } else {
-          throw new Error('ChromaDB returned ' + response.status);
-        }
-      } catch (err) {
-        console.error('ChromaDB search failed, falling back to fuzzy match:', err.message);
-      }
-    }
+    // ChromaDB disabled
 
     const filter: any = { shopId: { $in: nearbyShopIds } };
     const products = await this.productModel.find(filter);
@@ -78,8 +59,6 @@ export class SearchService {
 
           if (fuzzyScore >= 0.6 || prefixMatches > 0) {
             matchType = 'fuzzy';
-          } else if (queryProductIds !== null && queryProductIds.includes(p._id.toString())) {
-            matchType = 'similar';
           } else {
             const kwMatches = qTokens.filter((qt) =>
               keywords.some((kw) => kw.includes(qt)),
@@ -144,27 +123,8 @@ export class SearchService {
   }
 
   async searchInShop(shopId: string, query: string, params: Record<string, string>) {
-    let queryProductIds: string[] | null = null;
     const q = query.toLowerCase().trim();
-    if (q) {
-      try {
-        const response = await fetch('http://localhost:8000/query', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ query: query, n_results: 50 }),
-        });
-        if (response.ok) {
-          const data = await response.json();
-          if (data.results) {
-            queryProductIds = data.results.map((r: any) => r.product_id);
-          }
-        } else {
-          throw new Error('ChromaDB returned ' + response.status);
-        }
-      } catch (err) {
-        console.error('ChromaDB shop search failed:', err.message);
-      }
-    }
+    // ChromaDB disabled
 
     const filter: any = { shopId };
     const products = await this.productModel.find(filter);
@@ -189,8 +149,6 @@ export class SearchService {
 
           if (fuzzyScore >= 0.6 || prefixMatches > 0) {
             matchType = 'fuzzy';
-          } else if (queryProductIds !== null && queryProductIds.includes(p._id.toString())) {
-            matchType = 'similar';
           } else {
             const kwMatches = qTokens.filter((qt) =>
               keywords.some((kw) => kw.includes(qt)),

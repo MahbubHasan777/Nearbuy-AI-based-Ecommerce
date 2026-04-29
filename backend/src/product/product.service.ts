@@ -94,18 +94,6 @@ export class ProductService {
     Object.assign(product, dto);
     const saved = await product.save();
 
-    const textToEmbed = [
-      saved.name,
-      saved.description || '',
-      ...(saved.imageKeywords as string[] || []),
-    ].join('. ');
-
-    fetch('http://localhost:8000/upsert', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ product_id: id, text: textToEmbed }),
-    }).catch(err => console.error('ChromaDB Upsert Error:', err));
-
     return saved;
   }
 
@@ -117,9 +105,6 @@ export class ProductService {
     for (const img of product.images) {
       this.upload.deleteFile(img);
     }
-
-    fetch(`http://localhost:8000/delete/${id}`, { method: 'DELETE' })
-      .catch(err => console.error('ChromaDB Delete Error:', err));
 
     await product.deleteOne();
     return { message: 'Product deleted' };
