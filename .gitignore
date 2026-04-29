@@ -16,3 +16,6 @@ python-services/__pycache__/
 python-services/.venv/
 
 *.zip
+
+
+demo_frontend
