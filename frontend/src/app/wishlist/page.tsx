@@ -9,6 +9,7 @@ interface WishlistItem {
   _id: string;
   productId: string;
   shopId: string;
+  status: string;
   createdAt: string;
   product?: { name: string; images: string[]; price: number };
   shop?: { shopName: string };

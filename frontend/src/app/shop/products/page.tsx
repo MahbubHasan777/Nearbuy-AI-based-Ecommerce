@@ -135,8 +135,8 @@ export default function ShopProductsPage() {
                         <td className="px-6 py-4 text-sm text-on-surface-variant">{p.category?.name ?? '—'}</td>
                         <td className="px-6 py-4 text-sm text-on-surface-variant">{p.brand?.name ?? '—'}</td>
                         <td className="px-6 py-4 text-sm text-on-surface font-semibold text-right">
-                          ${(p.discountPrice ?? p.price).toFixed(2)}
-                          {p.discountPrice && <span className="ml-1 line-through text-outline text-xs">${p.price.toFixed(2)}</span>}
+                          ৳{(p.discountPrice ?? p.price).toFixed(2)}
+                          {p.discountPrice && <span className="ml-1 line-through text-outline text-xs">৳{p.price.toFixed(2)}</span>}
                         </td>
                         <td className="px-6 py-4">
                           <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold ${

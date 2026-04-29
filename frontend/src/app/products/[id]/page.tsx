@@ -13,6 +13,7 @@ interface Product {
   discountPrice?: number;
   discountPercentage?: number;
   description?: string;
+  specification?: string;
   images: string[];
   averageRating: number;
   totalRatings: number;
@@ -26,6 +27,7 @@ interface Product {
 interface Review {
   _id: string;
   customerId: string;
+  customer?: { name?: string; fullName?: string; username?: string; profilePic?: string };
   rating: number;
   comment: string;
   createdAt: string;

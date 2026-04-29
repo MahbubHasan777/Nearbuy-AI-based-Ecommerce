@@ -239,11 +239,10 @@ export class CustomerService {
     );
   }
 
-  async deactivateAccount(customerId: string) {
-    await this.prisma.customer.update({
-      where: { id: customerId },
-      data: { isActive: false },
-    });
-    return { message: 'Account deactivated' };
+  async deleteAccount(customerId: string) {
+    await this.prisma.orderHistory.deleteMany({ where: { customerId } });
+    await this.prisma.authToken.deleteMany({ where: { userId: customerId, userType: 'CUSTOMER' } });
+    await this.prisma.customer.delete({ where: { id: customerId } });
+    return { message: 'Account deleted successfully' };
   }
 }

@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import api from '@/lib/api';
 
+import { useAuth } from '@/context/AuthContext';
+
 const sideNav = [
   { href: '/admin/dashboard', icon: 'dashboard', label: 'Dashboard' },
   { href: '/admin/shops', icon: 'storefront', label: 'Shops', active: true },
@@ -23,6 +25,7 @@ interface Shop {
 }
 
 export default function AdminShopsPage() {
+  const { user, logout } = useAuth();
   const [shops, setShops] = useState<Shop[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('');
@@ -80,6 +83,19 @@ export default function AdminShopsPage() {
             </Link>
           ))}
         </nav>
+        <div className="px-6 pt-4 border-t border-slate-700 mt-4">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center text-white font-bold">A</div>
+            <div>
+              <p className="text-sm font-semibold text-white">Admin</p>
+              <p className="text-xs text-slate-400 truncate max-w-[140px]">{user?.email}</p>
+            </div>
+          </div>
+          <button onClick={() => logout()} className="w-full flex items-center gap-2 text-slate-400 hover:text-white text-sm py-2 transition-colors">
+            <span className="material-symbols-outlined text-sm">logout</span>
+            Sign Out
+          </button>
+        </div>
       </aside>
 
       <div className="lg:ml-64 min-h-screen">

@@ -102,7 +102,7 @@ export class AuthController {
     await this.authService.changePassword(
       req.user.id,
       req.user.role,
-      dto.oldPassword,
+      dto.currentPassword,
       dto.newPassword,
     );
     return { message: 'Password changed successfully' };

@@ -23,6 +23,7 @@ interface Product {
   discountPrice?: number;
   images: string[];
   averageRating: number;
+  totalRatings: number;
   status: string;
 }
 

@@ -14,6 +14,7 @@ interface SearchResult {
   discountPercentage?: number;
   images: string[];
   averageRating: number;
+  totalRatings: number;
   status: string;
   shop?: { shopId: string; shopName: string; distance_km?: number };
 }

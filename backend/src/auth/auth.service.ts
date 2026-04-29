@@ -118,6 +118,15 @@ export class AuthService {
   }
 
   async forgotPassword(email: string) {
+    const customer = await this.prisma.customer.findUnique({ where: { email } });
+    const shop = await this.prisma.shop.findUnique({ where: { ownerEmail: email } });
+    const admin = await this.prisma.admin.findUnique({ where: { email } });
+    const mod = await this.prisma.moderator.findUnique({ where: { email } });
+
+    if (!customer && !shop && !admin && !mod) {
+      throw new BadRequestException('Email not found in our system');
+    }
+
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
@@ -152,6 +161,16 @@ export class AuthService {
       const shop = await this.prisma.shop.findUnique({ where: { ownerEmail: email } });
       if (shop) {
         await this.prisma.shop.update({ where: { ownerEmail: email }, data: { passwordHash: hash } });
+      } else {
+        const admin = await this.prisma.admin.findUnique({ where: { email } });
+        if (admin) {
+          await this.prisma.admin.update({ where: { email }, data: { passwordHash: hash } });
+        } else {
+          const moderator = await this.prisma.moderator.findUnique({ where: { email } });
+          if (moderator) {
+            await this.prisma.moderator.update({ where: { email }, data: { passwordHash: hash } });
+          }
+        }
       }
     }
 
@@ -178,7 +197,9 @@ export class AuthService {
 
     if (!user) throw new BadRequestException('User not found');
 
+    console.log('Comparing oldPass:', oldPass, 'with hash:', user.passwordHash);
     const isValid = await bcrypt.compare(oldPass, user.passwordHash);
+    console.log('isValid:', isValid);
     if (!isValid) throw new BadRequestException('Incorrect old password');
 
     const hash = await bcrypt.hash(newPass, 12);

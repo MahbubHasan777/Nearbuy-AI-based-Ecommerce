@@ -4,10 +4,7 @@ import { useParams, useRouter } from 'next/navigation';
 import TopNavBar from '@/components/TopNavBar';
 import api from '@/lib/api';
 import Link from 'next/link';
-import dynamic from 'next/dynamic';
-import 'react-quill/dist/quill.snow.css';
-
-const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
+import QuillEditor from '@/components/QuillEditor';
 
 interface Category { _id: string; name: string; }
 interface Brand { _id: string; name: string; }
@@ -68,7 +65,8 @@ export default function EditProductPage() {
       fd.append('price', form.price);
       if (form.discountPrice) fd.append('discountPrice', form.discountPrice);
       if (form.discountPercentage) fd.append('discountPercentage', form.discountPercentage);
-      if (form.description) fd.append('description', form.description);
+      const descText = form.description.replace(/<[^>]+>/g, '').trim();
+      if (descText) fd.append('description', form.description);
       if (form.specification) fd.append('specification', form.specification);
       if (form.categoryId) fd.append('categoryId', form.categoryId);
       if (form.brandId) fd.append('brandId', form.brandId);
@@ -135,9 +133,11 @@ export default function EditProductPage() {
 
             <div>
               <label className="block text-xs font-bold text-outline uppercase tracking-wider mb-2">Description</label>
-              <div className="bg-surface-container-low border border-outline-variant rounded-xl overflow-hidden text-sm [&_.ql-toolbar]:border-none [&_.ql-toolbar]:border-b [&_.ql-toolbar]:border-outline-variant [&_.ql-container]:border-none [&_.ql-editor]:min-h-[150px]">
-                <ReactQuill theme="snow" value={form.description} onChange={val => setForm(f => ({ ...f, description: val }))} />
-              </div>
+              <QuillEditor 
+                value={form.description} 
+                onChange={val => setForm(f => ({ ...f, description: val }))} 
+                placeholder="Describe your product in detail..."
+              />
             </div>
 
             <div>

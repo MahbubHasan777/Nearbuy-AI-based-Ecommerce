@@ -14,11 +14,11 @@ import { Roles } from '../common/decorators/roles.decorator';
 
 @Controller('admin')
 @UseGuards(TokenGuard, RolesGuard)
-@Roles('ADMIN')
 export class AdminController {
   constructor(private adminService: AdminService) {}
 
   @Post('moderators')
+  @Roles('ADMIN')
   createModerator(
     @Body('email') email: string,
     @Body('password') password: string,
@@ -27,11 +27,13 @@ export class AdminController {
   }
 
   @Get('moderators')
+  @Roles('ADMIN', 'MODERATOR')
   listModerators() {
     return this.adminService.listModerators();
   }
 
   @Delete('moderators/:id')
+  @Roles('ADMIN')
   deleteModerator(@Param('id') id: string) {
     return this.adminService.deleteModerator(id);
   }

@@ -16,8 +16,8 @@ export default function LocationPicker({ lat, lng, onChange }: Props) {
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [isSearching, setIsSearching] = useState(false);
 
-  const searchLocation = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const searchLocation = async (e?: any) => {
+    e?.preventDefault();
     if (!searchQuery.trim()) return;
     setIsSearching(true);
     try {
@@ -43,7 +43,17 @@ export default function LocationPicker({ lat, lng, onChange }: Props) {
     if (typeof window === 'undefined' || !mapRef.current) return;
     if (mapInstanceRef.current) return;
 
+    let isMounted = true;
+
     import('leaflet').then(L => {
+      if (!isMounted) return;
+      if (mapInstanceRef.current) return;
+
+      const node = mapRef.current as any;
+      if (node && node._leaflet_id) {
+        node._leaflet_id = null;
+      }
+
       delete (L.Icon.Default.prototype as any)._getIconUrl;
       L.Icon.Default.mergeOptions({
         iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
@@ -73,6 +83,7 @@ export default function LocationPicker({ lat, lng, onChange }: Props) {
     });
 
     return () => {
+      isMounted = false;
       if (mapInstanceRef.current) {
         mapInstanceRef.current.remove();
         mapInstanceRef.current = null;
@@ -98,22 +109,28 @@ export default function LocationPicker({ lat, lng, onChange }: Props) {
         
         {/* Search Overlay */}
         <div className="absolute top-4 left-1/2 -translate-x-1/2 w-11/12 max-w-md z-[1000]">
-          <form onSubmit={searchLocation} className="flex bg-white rounded-xl shadow-lg overflow-hidden border border-slate-200">
+          <div className="flex bg-white rounded-xl shadow-lg overflow-hidden border border-slate-200">
             <input
               type="text"
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
+              onKeyDown={e => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  searchLocation();
+                }
+              }}
               placeholder="Search for a location..."
               className="flex-1 px-4 py-3 text-sm outline-none"
             />
-            <button type="submit" disabled={isSearching} className="px-4 bg-primary text-white font-bold flex items-center justify-center disabled:opacity-70">
+            <button type="button" onClick={searchLocation} disabled={isSearching} className="px-4 bg-primary text-white font-bold flex items-center justify-center disabled:opacity-70">
               {isSearching ? (
                 <span className="material-symbols-outlined animate-spin">refresh</span>
               ) : (
                 <span className="material-symbols-outlined">search</span>
               )}
             </button>
-          </form>
+          </div>
 
           {searchResults.length > 0 && (
             <div className="mt-2 bg-white rounded-xl shadow-xl border border-slate-200 max-h-60 overflow-y-auto">

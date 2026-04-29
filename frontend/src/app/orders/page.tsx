@@ -6,7 +6,8 @@ import api from '@/lib/api';
 import Link from 'next/link';
 
 interface Order {
-  _id: string;
+  id?: string;
+  _id?: string;
   productId: string;
   shopId: string;
   status: string;
@@ -56,8 +57,8 @@ export default function OrdersPage() {
         )}
 
         <div className="space-y-4">
-          {orders.map(order => (
-            <div key={order._id} className="bg-white rounded-2xl shadow-card border border-slate-100 overflow-hidden">
+          {orders.map((order, i) => (
+            <div key={order.id || order._id || i} className="bg-white rounded-2xl shadow-card border border-slate-100 overflow-hidden">
               <div className="flex">
                 <div className="w-24 h-24 flex-shrink-0 bg-surface-container">
                   {order.product?.images?.[0] ? (

@@ -39,4 +39,8 @@ export class UpdateProductDto {
   @IsOptional()
   @IsEnum(['IN_STOCK', 'OUT_OF_STOCK'])
   status?: string;
+
+  @IsOptional()
+  @IsString()
+  specification?: string;
 }

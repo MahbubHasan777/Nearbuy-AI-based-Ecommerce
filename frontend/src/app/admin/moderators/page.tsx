@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import api from '@/lib/api';
 
+import { useAuth } from '@/context/AuthContext';
+
 const sideNav = [
   { href: '/admin/dashboard', icon: 'dashboard', label: 'Dashboard' },
   { href: '/admin/shops', icon: 'storefront', label: 'Shops' },
@@ -17,6 +19,7 @@ interface Moderator {
 }
 
 export default function AdminModeratorsPage() {
+  const { user, logout } = useAuth();
   const [mods, setMods] = useState<Moderator[]>([]);
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState({ email: '', password: '' });
@@ -63,6 +66,19 @@ export default function AdminModeratorsPage() {
             </Link>
           ))}
         </nav>
+        <div className="px-6 pt-4 border-t border-slate-700 mt-4">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center text-white font-bold">A</div>
+            <div>
+              <p className="text-sm font-semibold text-white">Admin</p>
+              <p className="text-xs text-slate-400 truncate max-w-[140px]">{user?.email}</p>
+            </div>
+          </div>
+          <button onClick={() => logout()} className="w-full flex items-center gap-2 text-slate-400 hover:text-white text-sm py-2 transition-colors">
+            <span className="material-symbols-outlined text-sm">logout</span>
+            Sign Out
+          </button>
+        </div>
       </aside>
 
       <div className="lg:ml-64 min-h-screen">
@@ -105,9 +121,11 @@ export default function AdminModeratorsPage() {
                         </td>
                         <td className="px-6 py-4 text-sm text-slate-500">{new Date(mod.createdAt).toLocaleDateString()}</td>
                         <td className="px-6 py-4 text-right">
-                          <button onClick={() => deleteMod(mod.id)} className="p-1.5 text-slate-400 hover:text-red-500 transition-colors">
-                            <span className="material-symbols-outlined text-lg">delete</span>
-                          </button>
+                          {user?.role === 'ADMIN' && (
+                            <button onClick={() => deleteMod(mod.id)} className="p-1.5 text-slate-400 hover:text-red-500 transition-colors">
+                              <span className="material-symbols-outlined text-lg">delete</span>
+                            </button>
+                          )}
                         </td>
                       </tr>
                     ))}
@@ -116,31 +134,33 @@ export default function AdminModeratorsPage() {
               )}
             </div>
 
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-              <h3 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
-                <span className="material-symbols-outlined text-purple-500">person_add</span>
-                Add Moderator
-              </h3>
-              <form onSubmit={createMod} className="space-y-4">
-                <div>
-                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Email</label>
-                  <input required type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
-                    className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-purple-200 focus:border-purple-400 outline-none"
-                    placeholder="mod@nearbuy.com" />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Password</label>
-                  <input required type="password" minLength={8} value={form.password} onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
-                    className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-purple-200 focus:border-purple-400 outline-none"
-                    placeholder="Min 8 characters" />
-                </div>
-                {error && <p className="text-xs text-red-600 bg-red-50 px-3 py-2 rounded-lg">{error}</p>}
-                <button type="submit" disabled={creating}
-                  className="w-full py-2.5 bg-purple-600 text-white rounded-xl font-bold text-sm hover:bg-purple-700 active:scale-95 transition-all disabled:opacity-60">
-                  {creating ? 'Creating...' : 'Create Moderator'}
-                </button>
-              </form>
-            </div>
+            {user?.role === 'ADMIN' && (
+              <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                <h3 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
+                  <span className="material-symbols-outlined text-purple-500">person_add</span>
+                  Add Moderator
+                </h3>
+                <form onSubmit={createMod} className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Email</label>
+                    <input required type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
+                      className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-purple-200 focus:border-purple-400 outline-none"
+                      placeholder="mod@nearbuy.com" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Password</label>
+                    <input required type="password" minLength={8} value={form.password} onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
+                      className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-purple-200 focus:border-purple-400 outline-none"
+                      placeholder="Min 8 characters" />
+                  </div>
+                  {error && <p className="text-xs text-red-600 bg-red-50 px-3 py-2 rounded-lg">{error}</p>}
+                  <button type="submit" disabled={creating}
+                    className="w-full py-2.5 bg-purple-600 text-white rounded-xl font-bold text-sm hover:bg-purple-700 active:scale-95 transition-all disabled:opacity-60">
+                    {creating ? 'Creating...' : 'Create Moderator'}
+                  </button>
+                </form>
+              </div>
+            )}
           </div>
         </main>
       </div>

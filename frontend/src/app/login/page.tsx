@@ -39,7 +39,7 @@ export default function LoginPage() {
           <h2 className="text-2xl font-bold text-on-surface mb-6">Welcome back</h2>
 
           <div className="flex bg-surface-container rounded-xl p-1 mb-6">
-            {(['CUSTOMER', 'SHOP', 'ADMIN'] as const).map(role => (
+            {(['CUSTOMER', 'SHOP', 'ADMIN', 'MODERATOR'] as const).map(role => (
               <button
                 key={role}
                 onClick={() => setForm(f => ({ ...f, userType: role }))}
@@ -49,7 +49,7 @@ export default function LoginPage() {
                     : 'text-on-surface-variant hover:text-on-surface'
                 }`}
               >
-                {role === 'CUSTOMER' ? 'Customer' : role === 'SHOP' ? 'Shop' : 'Admin'}
+                {role === 'CUSTOMER' ? 'Customer' : role === 'SHOP' ? 'Shop' : role === 'ADMIN' ? 'Admin' : 'Moderator'}
               </button>
             ))}
           </div>

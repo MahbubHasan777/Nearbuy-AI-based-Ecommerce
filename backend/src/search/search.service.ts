@@ -168,8 +168,6 @@ export class SearchService {
 
     const filter: any = { shopId };
     const products = await this.productModel.find(filter);
-
-    const q = query.toLowerCase().trim();
     const scored = products.map((p) => {
       let matchType = '';
       

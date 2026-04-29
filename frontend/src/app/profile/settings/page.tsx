@@ -32,7 +32,7 @@ function SettingsContent() {
   useEffect(() => {
     api.get('/customer/profile').then(r => {
       setProfile(r.data);
-      setName(r.data.name || '');
+      setName(r.data.fullName || r.data.name || '');
       setAddress(r.data.address || '');
     }).finally(() => setLoading(false));
   }, []);
@@ -58,8 +58,9 @@ function SettingsContent() {
     e.preventDefault();
     setSavingGeneral(true);
     try {
-      await api.patch('/customer/profile', { name, address });
+      await api.patch('/customer/profile', { fullName: name, address });
       alert('Profile updated successfully!');
+      setProfile({ ...profile, fullName: name, address });
     } catch {
       alert('Failed to update profile.');
     } finally {
@@ -150,7 +151,7 @@ function SettingsContent() {
                   {picUploading && <div className="absolute inset-0 bg-white/60 flex items-center justify-center rounded-full"><span className="material-symbols-outlined animate-spin">refresh</span></div>}
                 </div>
                 <div>
-                  <h4 className="font-bold text-on-surface">{profile?.name}</h4>
+                  <h4 className="font-bold text-on-surface">{profile?.fullName || profile?.name}</h4>
                   <p className="text-sm text-outline">{profile?.email}</p>
                 </div>
               </div>

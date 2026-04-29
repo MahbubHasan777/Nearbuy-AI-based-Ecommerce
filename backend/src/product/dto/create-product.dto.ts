@@ -1,4 +1,5 @@
 import {
+  IsEnum,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -40,4 +41,12 @@ export class CreateProductDto {
   @Min(0)
   @Type(() => Number)
   discountPercentage?: number;
+
+  @IsOptional()
+  @IsString()
+  specification?: string;
+
+  @IsOptional()
+  @IsEnum(['IN_STOCK', 'OUT_OF_STOCK'])
+  status?: string;
 }

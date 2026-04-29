@@ -36,7 +36,7 @@ export default function AdminDashboardPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (user && user.role !== 'ADMIN') { router.push('/'); return; }
+    if (user && !['ADMIN', 'MODERATOR'].includes(user.role)) { router.push('/'); return; }
     Promise.all([
       api.get('/manage/shops?status=PENDING').catch(() => ({ data: [] })),
       api.get('/manage/shops').catch(() => ({ data: [] })),
@@ -208,21 +208,35 @@ export default function AdminDashboardPage() {
               </div>
 
               <div className="bg-slate-900 text-white rounded-2xl p-6">
-                <h3 className="font-bold mb-2">Admin Credentials</h3>
-                <div className="space-y-2 text-xs text-slate-400">
-                  <div className="flex justify-between">
-                    <span>Email</span>
-                    <span className="text-white font-mono">admin@nearbuy.com</span>
+                <h3 className="font-bold mb-4 flex items-center gap-2">
+                  <span className="material-symbols-outlined text-emerald-400">lock</span>
+                  Change Password
+                </h3>
+                <form onSubmit={async (e) => {
+                  e.preventDefault();
+                  const form = e.target as HTMLFormElement;
+                  const current = (form.elements.namedItem('current') as HTMLInputElement).value;
+                  const newPass = (form.elements.namedItem('new') as HTMLInputElement).value;
+                  try {
+                    await api.post('/auth/change-password', { currentPassword: current, newPassword: newPass });
+                    alert('Password changed successfully');
+                    form.reset();
+                  } catch (err: any) {
+                    alert(err.response?.data?.message || 'Failed to change password');
+                  }
+                }} className="space-y-3">
+                  <div>
+                    <label className="block text-xs text-slate-400 mb-1">Current Password</label>
+                    <input name="current" type="password" required className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500" />
                   </div>
-                  <div className="flex justify-between">
-                    <span>Password</span>
-                    <span className="text-white font-mono">admin123456</span>
+                  <div>
+                    <label className="block text-xs text-slate-400 mb-1">New Password</label>
+                    <input name="new" type="password" required minLength={6} className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-emerald-500" />
                   </div>
-                  <div className="flex justify-between">
-                    <span>Role</span>
-                    <span className="text-emerald-400 font-bold">ADMIN</span>
-                  </div>
-                </div>
+                  <button type="submit" className="w-full py-2 mt-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-sm font-bold transition-colors">
+                    Update Password
+                  </button>
+                </form>
               </div>
             </div>
           </div>
